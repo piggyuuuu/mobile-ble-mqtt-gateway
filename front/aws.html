@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AWS IoT Settings</title>
+  <style>
+    /* （同原来 style）省略… */
+  </style>
+</head>
+<body>
+  <header>BLE + AWS IoT Gateway</header>
+
+  <section>
+    <h2>AWS IoT Settings</h2>
+    <label>Endpoint:</label>
+    <input type="text" placeholder="a1xyz.iot.region.amazonaws.com" />
+    <label>Client ID:</label>
+    <input type="text" placeholder="bleDevice_001" />
+    <label>Certificate Path:</label>
+    <input type="text" placeholder="/certs/cert.pem" />
+    <label>Key Path:</label>
+    <input type="text" placeholder="/certs/private.key" />
+    <label>Cognito ID:</label>
+    <input type="text" placeholder="us-east-1:xxxxxxx" />
+    <button>Load Certificate</button>
+    <button>Connect to AWS</button>
+  </section>
+
+  <nav style="text-align:center; margin:1em 0;">
+    <button onclick="location.href='scan.html'">Scan</button>
+    <button onclick="location.href='gatt.html'">GATT Config</button>
+    <button onclick="location.href='realtime.html'">Real-time Data</button>
+  </nav>
+</body>
+</html>

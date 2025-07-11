@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BLE Device Scan</title>
+  <style>
+    /* （同原来 style）省略… */
+  </style>
+</head>
+<body>
+  <header>BLE + AWS IoT Gateway</header>
+
+  <section>
+    <h2>BLE Device Scan</h2>
+    <div class="device-item">Sensor_Temp_01 (RSSI: -48)</div>
+    <div class="device-item">Nano33BLE_Env (RSSI: -61)</div>
+    <button>Scan Again</button>
+    <button>Connect</button>
+  </section>
+
+  <nav style="text-align:center; margin:1em 0;">
+    <button onclick="location.href='gatt.html'">GATT Config</button>
+    <button onclick="location.href='aws.html'">AWS Settings</button>
+    <button onclick="location.href='realtime.html'">Real-time Data</button>
+  </nav>
+</body>
+</html>

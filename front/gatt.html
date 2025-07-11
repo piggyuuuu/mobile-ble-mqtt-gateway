@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GATT Configuration</title>
+  <style>
+    /* （同原来 style）省略… */
+  </style>
+</head>
+<body>
+  <header>BLE + AWS IoT Gateway</header>
+
+  <section>
+    <h2>GATT Configuration</h2>
+    <label>Service UUID:</label>
+    <input type="text" placeholder="e.g. 1809" />
+    <label>Characteristic UUID:</label>
+    <input type="text" placeholder="e.g. 2A1C" />
+    <label>Mode:</label>
+    <select>
+      <option>Read</option>
+      <option>Write</option>
+    </select>
+    <button>Read Value</button>
+    <button>Write Value</button>
+  </section>
+
+  <nav style="text-align:center; margin:1em 0;">
+    <button onclick="location.href='scan.html'">Scan</button>
+    <button onclick="location.href='aws.html'">AWS Settings</button>
+    <button onclick="location.href='realtime.html'">Real-time Data</button>
+  </nav>
+</body>
+</html>
