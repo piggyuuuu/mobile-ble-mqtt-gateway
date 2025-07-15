@@ -4,31 +4,193 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Real-time Data</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
-    /* （同原来 style）省略… */
+    :root {
+      --primary: #4A90E2;
+      --gray-light: #f5f7fa;
+      --gray-border: #e0e4e8;
+      --text-dark: #333;
+      --status-ok: #28a745;
+      --status-bad: #dc3545;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--gray-light);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--primary);
+      color: white;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      padding: 2rem;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--gray-border);
+      border-radius: 0.25rem;
+      background-color: var(--gray-light);
+      font-size: 0.95rem;
+    }
+
+    .status .ok {
+      color: var(--status-ok);
+      font-weight: 600;
+    }
+    .status .bad {
+      color: var(--status-bad);
+      font-weight: 600;
+    }
+
+    .log {
+      max-height: 200px;
+      overflow-y: auto;
+      background-color: #fff;
+      border: 1px solid var(--gray-border);
+      border-radius: 0.25rem;
+      padding: 1rem;
+      font-family: monospace;
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin-bottom: 1.5rem;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    button {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.25rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button.primary {
+      background-color: var(--primary);
+      color: white;
+    }
+    button.primary:hover {
+      background-color: #417dc1;
+      transform: translateY(-1px);
+    }
+
+    button.secondary {
+      background-color: #fff;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+    button.secondary:hover {
+      background-color: var(--primary);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    nav {
+      text-align: center;
+      margin: 2rem 0 1rem;
+    }
+    nav button {
+      margin: 0 0.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .status-grid {
+        grid-template-columns: 1fr;
+      }
+      .actions {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
   <header>BLE + AWS IoT Gateway</header>
 
-  <section>
-    <h2>Real-time Data</h2>
-    <div class="status"><div>BLE:</div><div>✅ Connected</div></div>
-    <div class="status"><div>AWS IoT:</div><div>✅ Connected</div></div>
-    <div class="status"><div>Last Message:</div><div>Published OK</div></div>
-    <div class="log">
-      [10:45:20] BLE Connected<br/>
-      [10:45:21] AWS Connected<br/>
-      [10:45:22] Temp: 23.4°C Sent<br/>
-    </div>
-    <button>Pause</button>
-    <button>Clear</button>
-  </section>
+  <main>
+    <div class="card">
+      <h2>Real-time Data</h2>
 
-  <nav style="text-align:center; margin:1em 0;">
-    <button onclick="location.href='scan.html'">Scan</button>
-    <button onclick="location.href='gatt.html'">GATT Config</button>
-    <button onclick="location.href='aws.html'">AWS Settings</button>
+      <div class="status-grid">
+        <div class="status">
+          <div>BLE:</div><div class="ok">✅ Connected</div>
+        </div>
+        <div class="status">
+          <div>AWS IoT:</div><div class="ok">✅ Connected</div>
+        </div>
+        <div class="status">
+          <div>Last Message:</div><div class="ok">Published OK</div>
+        </div>
+      </div>
+
+      <div class="log">
+        [10:45:20] BLE Connected<br/>
+        [10:45:21] AWS Connected<br/>
+        [10:45:22] Temp: 23.4°C Sent<br/>
+      </div>
+
+      <div class="actions">
+        <button class="secondary">Pause</button>
+        <button class="primary">Clear</button>
+      </div>
+    </div>
+  </main>
+
+  <nav>
+    <button class="secondary" onclick="location.href='scan.html'">Scan</button>
+    <button class="secondary" onclick="location.href='gatt.html'">GATT Config</button>
+    <button class="secondary" onclick="location.href='aws.html'">AWS Settings</button>
   </nav>
 </body>
 </html>
