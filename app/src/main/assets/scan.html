@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BLE Device Scan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4A90E2;
+      --gray-light: #f5f7fa;
+      --gray-border: #e0e4e8;
+      --text-dark: #333;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--gray-light);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--primary);
+      color: white;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .device-list {
+      display: grid;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .device-item {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--gray-border);
+      border-radius: 0.25rem;
+      background-color: white;
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    button {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.25rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button.primary {
+      background-color: var(--primary);
+      color: white;
+    }
+    button.primary:hover {
+      background-color: #417dc1;
+      transform: translateY(-1px);
+    }
+
+    button.secondary {
+      background-color: #fff;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+    button.secondary:hover {
+      background-color: var(--primary);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    nav {
+      text-align: center;
+      margin: 2rem 0 1rem;
+    }
+    nav button {
+      margin: 0 0.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>BLE + AWS IoT Gateway</header>
+
+<main>
+  <div class="card">
+    <h2>BLE Device Scan</h2>
+
+    <div class="device-list">
+      <div class="device-item">
+        <span>Sensor_Temp_01</span><span>RSSI: -48</span>
+      </div>
+      <div class="device-item">
+        <span>Nano33BLE_Env</span><span>RSSI: -61</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="secondary">Scan Again</button>
+      <button class="primary">Connect</button>
+    </div>
+  </div>
+</main>
+
+<nav>
+  <button class="secondary" onclick="location.href='gatt.html'">GATT Config</button>
+  <button class="secondary" onclick="location.href='aws.html'">AWS Settings</button>
+  <button class="secondary" onclick="location.href='realtime.html'">Real-time Data</button>
+</nav>
+</body>
+</html>
