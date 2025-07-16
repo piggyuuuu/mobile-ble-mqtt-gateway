@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AWS IoT Settings</title>
+  <!-- 可选：引入 Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4A90E2;
+      --gray-light: #f5f7fa;
+      --gray-border: #e0e4e8;
+      --text-dark: #333;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--gray-light);
+      color: var(--text-dark);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--primary);
+      color: white;
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 2rem;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      padding: 2rem;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem 1.5rem;
+    }
+
+    .form-grid label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+      color: var(--text-dark);
+    }
+
+    .form-grid input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--gray-border);
+      border-radius: 0.25rem;
+      font-size: 0.95rem;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    button {
+      flex: 1;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.25rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button.primary {
+      background-color: var(--primary);
+      color: white;
+    }
+    button.primary:hover {
+      background-color: #417dc1;
+      transform: translateY(-1px);
+    }
+
+    button.secondary {
+      background-color: #fff;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+    button.secondary:hover {
+      background-color: var(--primary);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    nav {
+      text-align: center;
+      margin: 2rem 0 1rem;
+    }
+    nav button {
+      margin: 0 0.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>BLE + AWS IoT Gateway</header>
+
+<main>
+  <div class="card">
+    <h2>AWS IoT Settings</h2>
+    <div class="form-grid">
+      <div>
+        <label for="endpoint">Endpoint</label>
+        <input id="endpoint" type="text" placeholder="a1xyz.iot.region.amazonaws.com" />
+      </div>
+      <div>
+        <label for="clientId">Client ID</label>
+        <input id="clientId" type="text" placeholder="bleDevice_001" />
+      </div>
+      <div>
+        <label for="certPath">Certificate Path</label>
+        <input id="certPath" type="text" placeholder="/certs/cert.pem" />
+      </div>
+      <div>
+        <label for="keyPath">Key Path</label>
+        <input id="keyPath" type="text" placeholder="/certs/private.key" />
+      </div>
+      <div style="grid-column: span 2;">
+        <label for="cognitoId">Cognito ID</label>
+        <input id="cognitoId" type="text" placeholder="us-east-1:xxxxxxx" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="secondary">Load Certificate</button>
+      <button class="primary">Connect to AWS</button>
+    </div>
+  </div>
+</main>
+
+<nav>
+  <button class="secondary" onclick="location.href='scan.html'">Scan</button>
+  <button class="secondary" onclick="location.href='gatt.html'">GATT Config</button>
+  <button class="secondary" onclick="location.href='realtime.html'">Real-time Data</button>
+</nav>
+</body>
+</html>
