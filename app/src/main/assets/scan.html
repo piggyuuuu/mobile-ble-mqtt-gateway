@@ -133,21 +133,29 @@
   <div class="card">
     <h2>BLE Device Scan</h2>
 
-    <div class="device-list">
-      <div class="device-item">
-        <span>Sensor_Temp_01</span><span>RSSI: -48</span>
-      </div>
-      <div class="device-item">
-        <span>Nano33BLE_Env</span><span>RSSI: -61</span>
-      </div>
-    </div>
+    <div class="device-list" id="deviceList"></div>
 
     <div class="actions">
-      <button class="secondary">Scan Again</button>
-      <button class="primary">Connect</button>
+      <button class="secondary" onclick="Android.scanBLE()">Scan Again</button>
+      <button class="primary" onclick="alert('Connect not yet implemented')">Connect</button>
     </div>
   </div>
 </main>
+
+<script>
+  // Java 通过 evaluateJavascript() 来调用这个函数
+  function addDeviceToList(name, rssi) {
+    const list = document.getElementById("deviceList");
+    const item = document.createElement("div");
+    item.className = "device-item";
+    item.innerHTML = `<span>${name}</span><span>RSSI: ${rssi}</span>`;
+    list.appendChild(item);
+  }
+
+  function clearDeviceList() {
+    document.getElementById("deviceList").innerHTML = "";
+  }
+</script>
 
 <nav>
   <button class="secondary" onclick="location.href='gatt.html'">GATT Config</button>
