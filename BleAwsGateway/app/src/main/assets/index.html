@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>BLE 连接演示</title>
+    <style>
+        body { font-family: sans-serif; padding: 16px; }
+        button { margin: 4px; padding: 8px; }
+        #devices li { cursor: pointer; margin: 4px 0; }
+    </style>
+</head>
+<body>
+<h1>BLE 设备扫描</h1>
+<button onclick="startScan()">开始扫描</button>
+<button onclick="stopScan()">停止扫描</button>
+<ul id="devices"></ul>
+<p id="status"></p>
+
+<script>
+    function startScan() {
+      Android.startScan();
+      document.getElementById('status').innerText = '正在扫描...';
+    }
+    function stopScan() {
+      Android.stopScan();
+      document.getElementById('status').innerText = '扫描已停止';
+    }
+    function onDeviceFound(dev) {
+      const li = document.createElement('li');
+      li.textContent = dev.name + ' (' + dev.address + ')';
+      li.onclick = () => connect(dev.address);
+      document.getElementById('devices').appendChild(li);
+    }
+    function connect(addr) {
+      Android.connectDevice(addr);
+      document.getElementById('status').innerText = '连接中：' + addr;
+    }
+    function onConnectionState(addr, state) {
+      document.getElementById('status').innerText = addr + ' 已 ' + state;
+    }
+</script>
+</body>
+</html>

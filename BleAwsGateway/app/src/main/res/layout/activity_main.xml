@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/btnScan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="扫描 BLE 设备" />
+
+    <ListView
+        android:id="@+id/listViewDevices"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:dividerHeight="1dp" />
+
+    <!-- 实时数据区 -->
+    <TextView
+        android:id="@+id/tvConnectionStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="状态：未连接"
+        android:textStyle="bold"
+        android:paddingTop="8dp"/>
+
+    <ToggleButton
+        android:id="@+id/toggleReceive"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textOff="开始接收"
+        android:textOn="停止接收"
+        android:enabled="false" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#f0f0f0"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/tvReceivedData"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="" />
+    </ScrollView>
+</LinearLayout>
