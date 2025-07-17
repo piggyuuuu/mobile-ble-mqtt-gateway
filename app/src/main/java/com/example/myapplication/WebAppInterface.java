@@ -11,7 +11,12 @@ public class WebAppInterface {
         mContext = c;
         webView = w;
     }
-
+    @JavascriptInterface
+    public void scanBLE() {
+        ((MainActivity) mContext).runOnUiThread(() -> {
+            ((MainActivity) mContext).startBLEScan();
+        });
+    }
     // 让 Java 向网页注入状态或日志
     public void updateStatus(final String type, final String value) {
         webView.post(() -> {

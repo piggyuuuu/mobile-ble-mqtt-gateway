@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void startBLEScan() {
+    public void startBLEScan() {
         bleScanner = bluetoothAdapter.getBluetoothLeScanner();
         if (bleScanner == null) {
             jsBridge.updateStatus("BLE", "❌ Scanner unavailable");
