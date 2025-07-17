@@ -1,58 +1,98 @@
-package com.example.myapplication;
-
+import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.le.*;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int REQUEST_CODE_PERMISSIONS = 1001;
     private WebView webView;
+    private WebAppInterface jsBridge;
+    private BluetoothAdapter bluetoothAdapter;
+    private BluetoothLeScanner bleScanner;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
+        setContentView(R.layout.activity_main);
         webView = findViewById(R.id.webview);
 
         WebSettings settings = webView.getSettings();
-        settings.setJavaScriptEnabled(true);           // 启用 JS
-        settings.setAllowFileAccess(true);             // 允许访问本地文件
-        settings.setAllowContentAccess(true);          // 允许访问 content://
-        settings.setDomStorageEnabled(true);           // 启用 localStorage/sessionStorage（用于 AWS 设置）
-        settings.setMediaPlaybackRequiresUserGesture(false); // 如有音视频，可允许自动播放
+        settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true);
+        webView.setWebViewClient(new WebViewClient());
 
-        webView.setWebViewClient(new WebViewClient() {
-            // Android < 7.0
+        jsBridge = new WebAppInterface(this, webView);
+        webView.addJavascriptInterface(jsBridge, "Android");
+
+        webView.loadUrl("file:///android_asset/web/realtime.html");
+
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{
+                            Manifest.permission.BLUETOOTH_SCAN,
+                            Manifest.permission.BLUETOOTH_CONNECT,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                    },
+                    REQUEST_CODE_PERMISSIONS);
+        } else {
+            startBLEScan();
+        }
+    }
+
+    private void startBLEScan() {
+        bleScanner = bluetoothAdapter.getBluetoothLeScanner();
+        if (bleScanner == null) {
+            jsBridge.updateStatus("BLE", "❌ Scanner unavailable");
+            return;
+        }
+
+        jsBridge.updateStatus("BLE", "✅ Scanning...");
+        bleScanner.startScan(new ScanCallback() {
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                view.loadUrl(url);
-                return true;
+            public void onScanResult(int callbackType, ScanResult result) {
+                String name = result.getDevice().getName();
+                if (name == null) name = "Unknown";
+                jsBridge.updateStatus("log", "Found device: " + name);
             }
 
-            // Android >= 7.0
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                view.loadUrl(request.getUrl().toString());
-                return true;
+            public void onScanFailed(int errorCode) {
+                jsBridge.updateStatus("BLE", "❌ Scan failed: " + errorCode);
             }
         });
 
-        // 加载 HTML 页面
-        webView.loadUrl("file:///android_asset/web/realtime.html");
-        // 如果你希望从 scan 页面开始： webView.loadUrl("file:///android_asset/web/scan.html");
+        // 停止扫描（例如10秒后）
+        webView.postDelayed(() -> {
+            bleScanner.stopScan(new ScanCallback() {});
+            jsBridge.updateStatus("BLE", "✅ Scan complete");
+        }, 10000);
     }
 
+    // 权限回调
     @Override
-    public void onBackPressed() {
-        if (webView.canGoBack()) {
-            webView.goBack();
-        } else {
-            super.onBackPressed();
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startBLEScan();
+            } else {
+                jsBridge.updateStatus("BLE", "❌ Permission denied");
+            }
         }
     }
 }

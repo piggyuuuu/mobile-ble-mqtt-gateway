@@ -194,3 +194,21 @@
 </nav>
 </body>
 </html>
+<script>
+  function updateStatusFromApp(type, value) {
+    const log = document.querySelector('.log');
+    const statusMap = {
+      "BLE": document.querySelectorAll('.status')[0].children[1],
+      "AWS": document.querySelectorAll('.status')[1].children[1],
+      "Last": document.querySelectorAll('.status')[2].children[1],
+    };
+
+    if (type === "log") {
+      log.innerHTML += `[${new Date().toLocaleTimeString()}] ${value}<br/>`;
+      log.scrollTop = log.scrollHeight;
+    } else if (statusMap[type]) {
+      statusMap[type].innerHTML = value.includes("✅") ? "✅ " + value : "❌ " + value;
+      statusMap[type].className = value.includes("✅") ? "ok" : "bad";
+    }
+  }
+</script>
