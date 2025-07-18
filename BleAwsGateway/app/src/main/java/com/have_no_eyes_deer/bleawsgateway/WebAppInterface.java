@@ -23,7 +23,8 @@ public class WebAppInterface {
     public WebAppInterface(Context ctx, WebView wv) {
         context = ctx;
         webView = wv;
-        scanner = ((MainActivity)ctx).bleScanner;
+        scanner = ((MainActivity)ctx).getBleScanner();
+
     }
 
     @JavascriptInterface

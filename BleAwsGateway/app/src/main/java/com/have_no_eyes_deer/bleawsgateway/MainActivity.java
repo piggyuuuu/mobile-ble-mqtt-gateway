@@ -11,81 +11,102 @@ import android.bluetooth.BluetoothGattService;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.OpenableColumns;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 import android.widget.Toast;
-import java.nio.charset.StandardCharsets;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.amazonaws.mobileconnectors.iot.AWSIotKeystoreHelper;
+import com.amazonaws.mobileconnectors.iot.AWSIotMqttManager;
+import com.amazonaws.mobileconnectors.iot.AWSIotMqttClientStatusCallback;
+import com.amazonaws.mobileconnectors.iot.AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus;
+import com.amazonaws.mobileconnectors.iot.AWSIotMqttQos;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
-import android.content.Intent;         // ← 新增
-import android.widget.Button;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
-    // Client Characteristic Configuration descriptor UUID
-    private static final UUID CCC_UUID =
-            UUID.fromString("00002902-0000-1000-8000-00805f9b34fb");
-
+    // ==== BLE 配置 ====
+    private static final String CCC_UUID_STR = "00002902-0000-1000-8000-00805f9b34fb";
+    private final UUID CCC_UUID = UUID.fromString(CCC_UUID_STR);
     private BluetoothAdapter bluetoothAdapter;
-    public BluetoothLeScanner bleScanner;
+    private BluetoothLeScanner bleScanner;
     private BluetoothGatt bluetoothGatt;
-    private BluetoothGattCharacteristic notifyCharacteristic;
-    private BluetoothGattCharacteristic writeCharacteristic;
-
+    private BluetoothGattCharacteristic notifyCharacteristic, writeCharacteristic;
     private Handler handler = new Handler();
     private boolean scanning = false;
-
-    private static final long SCAN_PERIOD = 10_000; // 10 seconds
+    private static final long SCAN_PERIOD = 10_000;
     private static final int REQUEST_PERMISSIONS = 1001;
 
-    private Button btnScan;
-    private ListView listView;
+    // ==== UI 元素 ====
+    private Button btnScan, btnAwsSettings, btnConnectAws;
+    private ListView listViewDevices;
     private ArrayAdapter<String> adapter;
     private List<BluetoothDevice> deviceList = new ArrayList<>();
-
-    private TextView tvConnectionStatus;
+    private TextView tvConnectionStatus, tvReceivedData;
     private ToggleButton toggleReceive;
-    private TextView tvReceivedData;
-    private Button btnAwsSettings;
 
+    // ==== AWS IoT 配置常量 ====
+    private static final String PREFS_NAME        = "AwsPrefs";
+    private static final String KEY_ENDPOINT      = "endpoint";
+    private static final String KEY_KEY_URI       = "keyUri";
+    private static final String KEY_CRED_URI      = "credUri";
+    private static final String KEYSTORE_NAME     = "iot_keystore";
+    private static final String KEYSTORE_PASSWORD = "iot_passwd";
+    private static final String CERTIFICATE_ID    = "iot_cert";
+    private TextView tvAwsStatus;
 
+    private AWSIotMqttManager mqttManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // bind views
+
+        // 绑定视图
         btnScan            = findViewById(R.id.btnScan);
-        listView           = findViewById(R.id.listViewDevices);
+        listViewDevices    = findViewById(R.id.listViewDevices);
         tvConnectionStatus = findViewById(R.id.tvConnectionStatus);
+        tvAwsStatus        = findViewById(R.id.tvAwsStatus);
         toggleReceive      = findViewById(R.id.toggleReceive);
         tvReceivedData     = findViewById(R.id.tvReceivedData);
-        btnAwsSettings     = findViewById(R.id.btnAwsSettings);  // ← 新增绑定
-        listView           = findViewById(R.id.listViewDevices);
+        btnAwsSettings     = findViewById(R.id.btnAwsSettings);
+        btnConnectAws      = findViewById(R.id.btnConnectAws);
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
-        listView.setAdapter(adapter);
-        btnAwsSettings = findViewById(R.id.btnAwsSettings);
-        btnAwsSettings.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, AwsSettingsActivity.class);
-            startActivity(intent);
-        });
-        // init Bluetooth
+        listViewDevices.setAdapter(adapter);
+
+        // AWS 设置页面跳转
+        btnAwsSettings.setOnClickListener(v ->
+                startActivity(new Intent(MainActivity.this, AwsSettingsActivity.class))
+        );
+
+        // 点击后触发 AWS IoT 连接
+        btnConnectAws.setOnClickListener(v -> connectAwsIot());
+
+        // BLE 初始化
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
             Toast.makeText(this, "请先打开蓝牙", Toast.LENGTH_LONG).show();
@@ -94,23 +115,22 @@ public class MainActivity extends AppCompatActivity {
         }
         bleScanner = bluetoothAdapter.getBluetoothLeScanner();
 
-        // permissions
+        // 请求定位 & 蓝牙权限
         checkAndRequestPermissions();
 
-        // scan button
+        // 扫描按钮逻辑
         btnScan.setOnClickListener(v -> {
             if (!scanning) startBleScan();
             else           stopBleScan();
         });
 
-        // device select
-        listView.setOnItemClickListener((parent, view, position, id) -> {
-            BluetoothDevice device = deviceList.get(position);
-            connectToDevice(device);
-        });
+        // 点击列表设备连接
+        listViewDevices.setOnItemClickListener((parent, view, position, id) ->
+                connectToDevice(deviceList.get(position))
+        );
 
-        // receive toggle
-        toggleReceive.setOnCheckedChangeListener((buttonView, isChecked) -> {
+        // 收发切换
+        toggleReceive.setOnCheckedChangeListener((btn, isChecked) -> {
             if (notifyCharacteristic == null || bluetoothGatt == null) return;
             if (isChecked) {
                 startReceiving();
@@ -120,6 +140,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    /** ← 新增：供外部访问 BLE Scanner */
+    public BluetoothLeScanner getBleScanner() {
+        return bleScanner;
+    }
+
+    // ===== BLE 方法集 =====
 
     private void checkAndRequestPermissions() {
         List<String> perms = new ArrayList<>();
@@ -138,14 +165,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         if (!perms.isEmpty()) {
-            ActivityCompat.requestPermissions(this,
-                    perms.toArray(new String[0]), REQUEST_PERMISSIONS);
+            ActivityCompat.requestPermissions(
+                    this, perms.toArray(new String[0]), REQUEST_PERMISSIONS
+            );
         }
     }
 
     private final ScanCallback scanCallback = new ScanCallback() {
-        @Override
-        public void onScanResult(int callbackType, ScanResult result) {
+        @Override public void onScanResult(int callbackType, ScanResult result) {
             BluetoothDevice device = result.getDevice();
             if (device.getName() != null && !deviceList.contains(device)) {
                 deviceList.add(device);
@@ -181,8 +208,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private final BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
-        @Override
-        public void onConnectionStateChange(@NonNull BluetoothGatt gatt, int status, int newState) {
+        @Override public void onConnectionStateChange(@NonNull BluetoothGatt gatt,
+                                                      int status, int newState) {
             if (newState == BluetoothGatt.STATE_CONNECTED) {
                 runOnUiThread(() -> tvConnectionStatus.setText("状态：已连接"));
                 gatt.discoverServices();
@@ -196,9 +223,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        @Override
-        public void onServicesDiscovered(@NonNull BluetoothGatt gatt, int status) {
-            // 找到第一个支持 NOTIFY 和第一个支持 WRITE 的特征
+        @Override public void onServicesDiscovered(@NonNull BluetoothGatt gatt, int status) {
             for (BluetoothGattService svc : gatt.getServices()) {
                 for (BluetoothGattCharacteristic chr : svc.getCharacteristics()) {
                     int props = chr.getProperties();
@@ -214,15 +239,14 @@ public class MainActivity extends AppCompatActivity {
                 }
                 if (notifyCharacteristic != null && writeCharacteristic != null) break;
             }
-            runOnUiThread(() -> toggleReceive.setEnabled(notifyCharacteristic != null));
+            runOnUiThread(() ->
+                    toggleReceive.setEnabled(notifyCharacteristic != null)
+            );
         }
 
-        @Override
-        public void onCharacteristicChanged(@NonNull BluetoothGatt gatt,
-                                            @NonNull BluetoothGattCharacteristic characteristic) {
-            byte[] raw = characteristic.getValue();
-            // 显式用 UTF-8 解码
-            String data = new String(raw, StandardCharsets.UTF_8);
+        @Override public void onCharacteristicChanged(@NonNull BluetoothGatt gatt,
+                                                      @NonNull BluetoothGattCharacteristic characteristic) {
+            String data = new String(characteristic.getValue(), StandardCharsets.UTF_8);
             runOnUiThread(() -> tvReceivedData.append(data + "\n"));
         }
     };
@@ -245,12 +269,98 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /** 向板子发送字符 's' */
     private void sendStartCommand() {
         if (writeCharacteristic == null || bluetoothGatt == null) return;
-        byte[] cmd = "s".getBytes(StandardCharsets.UTF_8);
-        writeCharacteristic.setValue(cmd);
+        writeCharacteristic.setValue("s".getBytes(StandardCharsets.UTF_8));
         bluetoothGatt.writeCharacteristic(writeCharacteristic);
+    }
+
+    // ===== AWS IoT 连接逻辑 =====
+
+    private void connectAwsIot() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        String endpoint   = prefs.getString(KEY_ENDPOINT, "");
+        String keyUriStr  = prefs.getString(KEY_KEY_URI, null);
+        String certUriStr = prefs.getString(KEY_CRED_URI, null);
+
+        if (endpoint.isEmpty() || keyUriStr == null || certUriStr == null) {
+            Toast.makeText(this, "请先在“AWS IoT 设置”中完成配置", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Uri keyUri  = Uri.parse(keyUriStr);
+        Uri certUri = Uri.parse(certUriStr);
+        String keystorePath = getFilesDir().getAbsolutePath();
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            try {
+                if (!AWSIotKeystoreHelper.isKeystorePresent(keystorePath, KEYSTORE_NAME)) {
+                    String certPem = slurp(getContentResolver().openInputStream(certUri));
+                    String keyPem  = slurp(getContentResolver().openInputStream(keyUri));
+                    AWSIotKeystoreHelper.saveCertificateAndPrivateKey(
+                            CERTIFICATE_ID, certPem, keyPem,
+                            keystorePath, KEYSTORE_NAME, KEYSTORE_PASSWORD
+                    );
+                }
+                KeyStore ks = AWSIotKeystoreHelper.getIotKeystore(
+                        CERTIFICATE_ID, keystorePath, KEYSTORE_NAME, KEYSTORE_PASSWORD
+                );
+                String clientId = UUID.randomUUID().toString();
+                mqttManager = new AWSIotMqttManager(clientId, endpoint);
+                mqttManager.setKeepAlive(10);
+                mqttManager.connect(ks, new AWSIotMqttClientStatusCallback() {
+                    @Override
+                    public void onStatusChanged(AWSIotMqttClientStatus status, Throwable throwable) {
+                        runOnUiThread(() -> {
+                            Toast.makeText(
+                                    MainActivity.this,
+                                    "AWS IoT 连接状态: " + status,
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                            // —— 新增：更新右侧状态栏 ——
+                            tvAwsStatus.setText("AWS: " + status.name());
+
+                            // 如果连接成功，发布 "connected" 并写日志
+                            if (status == AWSIotMqttClientStatus.Connected) {
+                                try {
+                                    String topic = "test/bleawsgateway";
+                                    mqttManager.publishString(
+                                            "connected",
+                                            topic,
+                                            AWSIotMqttQos.QOS0
+                                    );
+                                    // —— 在日志框追加 ——
+                                    tvReceivedData.append("AWS connected → topic: " + topic + "\n");
+                                } catch (Exception e) {
+                                    tvReceivedData.append("AWS publish error: " + e.getMessage() + "\n");
+                                    e.printStackTrace();
+                                }
+                            } else if (status == AWSIotMqttClientStatus.ConnectionLost && throwable != null) {
+                                // 连接断开或失败时，也记录一下
+                                tvReceivedData.append("AWS error: " + throwable.getMessage() + "\n");
+                            }
+                        });
+                    }
+                });
+            } catch (Exception e) {
+                runOnUiThread(() ->
+                        Toast.makeText(
+                                MainActivity.this,
+                                "AWS 连接异常: " + e.getMessage(),
+                                Toast.LENGTH_LONG
+                        ).show()
+                );
+            }
+        });
+    }
+
+    private String slurp(InputStream is) throws Exception {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = is.read(buf)) != -1) baos.write(buf, 0, len);
+        return baos.toString(StandardCharsets.UTF_8.name());
     }
 
     @Override
@@ -258,5 +368,6 @@ public class MainActivity extends AppCompatActivity {
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // 可根据需要在此处理权限授予结果
     }
 }

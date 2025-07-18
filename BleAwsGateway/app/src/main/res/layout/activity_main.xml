@@ -19,13 +19,29 @@
         android:dividerHeight="1dp" />
 
     <!-- 实时数据区 -->
-    <TextView
-        android:id="@+id/tvConnectionStatus"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="状态：未连接"
-        android:textStyle="bold"
-        android:paddingTop="8dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="8dp">
+
+            <TextView
+                android:id="@+id/tvConnectionStatus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="BLE: 未连接"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvAwsStatus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="AWS: 未连接"
+                android:textStyle="bold"
+                android:gravity="end" />
+        </LinearLayout>
 
     <ToggleButton
         android:id="@+id/toggleReceive"
@@ -39,6 +55,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="AWS IoT 设置"
+        android:layout_marginTop="8dp"/>
+    <Button
+        android:id="@+id/btnConnectAws"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="连接 AWS IoT"
         android:layout_marginTop="8dp"/>
     <ScrollView
         android:layout_width="match_parent"
