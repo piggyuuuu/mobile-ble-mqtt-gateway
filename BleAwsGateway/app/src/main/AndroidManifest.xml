@@ -27,7 +27,7 @@
 
         <!-- 新增 AWS 设置界面 -->
         <activity
-            android:name=".AWSSettingsActivity"
-            android:exported="true"/>
+            android:name=".AwsSettingsActivity"
+            android:label="AWS IoT 设置"/>
     </application>
 </manifest>

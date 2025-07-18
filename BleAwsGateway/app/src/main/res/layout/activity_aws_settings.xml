@@ -1,80 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp">
 
-  <LinearLayout
-      android:orientation="vertical"
-      android:padding="16dp"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-      <EditText
-          android:id="@+id/etEndpoint"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:hint="Endpoint (e.g. abcd1234-ats.iot.ap-southeast-2.amazonaws.com)" />
-
-      <EditText
-          android:id="@+id/etClientId"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:hint="Client ID" />
-
-      <!-- 证书路径 + 浏览 -->
-      <LinearLayout
-          android:orientation="horizontal"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/etCertPath"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Certificate URI"
-            android:focusable="false"
-            android:clickable="false"/>
-        <Button
-            android:id="@+id/btnBrowseCert"
+        <!-- Endpoint -->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="浏览" />
-      </LinearLayout>
-
-      <!-- 私钥路径 + 浏览 -->
-      <LinearLayout
-          android:orientation="horizontal"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="8dp">
+            android:text="Endpoint:" />
         <EditText
-            android:id="@+id/etKeyPath"
-            android:layout_width="0dp"
+            android:id="@+id/etEndpoint"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="Key URI"
-            android:focusable="false"
-            android:clickable="false"/>
-        <Button
-            android:id="@+id/btnBrowseKey"
+            android:hint="请输入 AWS IoT Endpoint" />
+
+        <!-- Key -->
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="浏览" />
-      </LinearLayout>
+            android:text="Key:"
+            android:layout_marginTop="8dp" />
+        <EditText
+            android:id="@+id/etKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请输入 Key" />
 
-      <EditText
-          android:id="@+id/etCognitoId"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:hint="Cognito Identity Pool ID"
-          android:layout_marginTop="8dp" />
+        <!-- Credentials -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Credentials:"
+            android:layout_marginTop="8dp" />
+        <EditText
+            android:id="@+id/etCredentials"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请输入 Credentials" />
 
-      <Button
-          android:id="@+id/btnSaveAwsSettings"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text="保存设置并返回"
-          android:layout_marginTop="16dp" />
-  </LinearLayout>
+        <!-- 保存按钮 -->
+        <Button
+            android:id="@+id/btnSaveSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="保存"
+            android:layout_marginTop="16dp"/>
+    </LinearLayout>
 </ScrollView>
