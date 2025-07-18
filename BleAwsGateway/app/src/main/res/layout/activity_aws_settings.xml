@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Endpoint -->
+        <!-- Endpoint 仍保留为 EditText -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -20,29 +20,57 @@
             android:layout_height="wrap_content"
             android:hint="请输入 AWS IoT Endpoint" />
 
-        <!-- Key -->
+        <!-- Key 文件选择 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Key:"
-            android:layout_marginTop="8dp" />
-        <EditText
-            android:id="@+id/etKey"
+            android:text="Key 文件："
+            android:layout_marginTop="12dp" />
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="请输入 Key" />
+            android:orientation="horizontal">
 
-        <!-- Credentials -->
+            <TextView
+                android:id="@+id/tvKeyPath"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="未选择文件"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnSelectKey"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="浏览" />
+        </LinearLayout>
+
+        <!-- Credentials 文件选择 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Credentials:"
-            android:layout_marginTop="8dp" />
-        <EditText
-            android:id="@+id/etCredentials"
+            android:text="Credentials 文件："
+            android:layout_marginTop="12dp" />
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="请输入 Credentials" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvCredPath"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="未选择文件"
+                android:padding="8dp" />
+
+            <Button
+                android:id="@+id/btnSelectCred"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="浏览" />
+        </LinearLayout>
 
         <!-- 保存按钮 -->
         <Button
@@ -50,6 +78,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="保存"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="24dp"/>
     </LinearLayout>
 </ScrollView>

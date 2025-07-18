@@ -1,47 +1,113 @@
 package com.have_no_eyes_deer.bleawsgateway;
 
+import android.content.Intent;
+import android.content.ContentResolver;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class AwsSettingsActivity extends AppCompatActivity {
-    private EditText etEndpoint, etKey, etCredentials;
-    private Button btnSave;
+    private EditText etEndpoint;
+    private TextView tvKeyPath, tvCredPath;
+    private Button btnSelectKey, btnSelectCred, btnSave;
 
-    private static final String PREFS_NAME       = "AwsPrefs";
-    private static final String KEY_ENDPOINT     = "endpoint";
-    private static final String KEY_KEY          = "key";
-    private static final String KEY_CREDENTIALS  = "credentials";
+    private ActivityResultLauncher<String[]> keyPicker;
+    private ActivityResultLauncher<String[]> credPicker;
+
+    private Uri keyUri, credUri;
+
+    private static final String PREFS_NAME      = "AwsPrefs";
+    private static final String KEY_ENDPOINT    = "endpoint";
+    private static final String KEY_KEY_URI     = "keyUri";
+    private static final String KEY_CRED_URI    = "credUri";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_aws_settings);
 
-        // 绑定控件
-        etEndpoint    = findViewById(R.id.etEndpoint);
-        etKey         = findViewById(R.id.etKey);
-        etCredentials = findViewById(R.id.etCredentials);
-        btnSave       = findViewById(R.id.btnSaveSettings);
+        etEndpoint   = findViewById(R.id.etEndpoint);
+        tvKeyPath    = findViewById(R.id.tvKeyPath);
+        tvCredPath   = findViewById(R.id.tvCredPath);
+        btnSelectKey = findViewById(R.id.btnSelectKey);
+        btnSelectCred= findViewById(R.id.btnSelectCred);
+        btnSave      = findViewById(R.id.btnSaveSettings);
 
-        // 读取已有配置
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        etEndpoint.setText(   prefs.getString(KEY_ENDPOINT, "")   );
-        etKey.setText(        prefs.getString(KEY_KEY, "")        );
-        etCredentials.setText(prefs.getString(KEY_CREDENTIALS, ""));
+        etEndpoint.setText(prefs.getString(KEY_ENDPOINT, ""));
+        String savedKeyUri  = prefs.getString(KEY_KEY_URI, null);
+        String savedCredUri = prefs.getString(KEY_CRED_URI, null);
+        if (savedKeyUri  != null) { keyUri  = Uri.parse(savedKeyUri);  tvKeyPath.setText(getFileName(keyUri)); }
+        if (savedCredUri != null) { credUri = Uri.parse(savedCredUri); tvCredPath.setText(getFileName(credUri)); }
 
-        // 保存并退出
+        // 注册文件选择 Launcher
+        keyPicker = registerForActivityResult(
+                new ActivityResultContracts.OpenDocument(),
+                uri -> {
+                    if (uri != null) {
+                        getContentResolver().takePersistableUriPermission(uri,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        keyUri = uri;
+                        tvKeyPath.setText(getFileName(uri));
+                    }
+                }
+        );
+        credPicker = registerForActivityResult(
+                new ActivityResultContracts.OpenDocument(),
+                uri -> {
+                    if (uri != null) {
+                        getContentResolver().takePersistableUriPermission(uri,
+                                Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        credUri = uri;
+                        tvCredPath.setText(getFileName(uri));
+                    }
+                }
+        );
+
+        btnSelectKey.setOnClickListener(v ->
+                keyPicker.launch(new String[]{"*/*"})
+        );
+        btnSelectCred.setOnClickListener(v ->
+                credPicker.launch(new String[]{"*/*"})
+        );
+
         btnSave.setOnClickListener(v -> {
+            if (etEndpoint.getText().toString().trim().isEmpty() ||
+                    keyUri == null || credUri == null) {
+                Toast.makeText(this,
+                        "请填写 Endpoint 并选择 Key、Credentials 文件",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putString(KEY_ENDPOINT,    etEndpoint.getText().toString().trim());
-            editor.putString(KEY_KEY,         etKey.getText().toString().trim());
-            editor.putString(KEY_CREDENTIALS, etCredentials.getText().toString().trim());
+            editor.putString(KEY_ENDPOINT, etEndpoint.getText().toString().trim());
+            editor.putString(KEY_KEY_URI,  keyUri.toString());
+            editor.putString(KEY_CRED_URI, credUri.toString());
             editor.apply();
             Toast.makeText(this, "AWS IoT 配置已保存", Toast.LENGTH_SHORT).show();
             finish();
         });
+    }
+
+    /** 从 Uri 中读取显示名称 */
+    private String getFileName(Uri uri) {
+        String result = null;
+        ContentResolver cr = getContentResolver();
+        try (Cursor cursor = cr.query(uri, null, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                result = cursor.getString(idx);
+            }
+        }
+        return result != null ? result : uri.getLastPathSegment();
     }
 }
