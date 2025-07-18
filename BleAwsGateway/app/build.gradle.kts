@@ -35,7 +35,8 @@ android {
 }
 
 dependencies {
-
+    implementation("com.amazonaws:aws-android-sdk-iot:2.16.12")
+    implementation("com.amazonaws:aws-android-sdk-mobile-client:2.16.12")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.constraintlayout)
