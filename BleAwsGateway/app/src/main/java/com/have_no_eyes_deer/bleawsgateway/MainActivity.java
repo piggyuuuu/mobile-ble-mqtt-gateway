@@ -15,6 +15,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.content.Context;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,6 +30,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 import android.widget.Toast;
+import android.widget.EditText;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -45,9 +52,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
-    // ==== BLE 配置 ====
+    // ==== BLE constants ====
     private static final String CCC_UUID_STR = "00002902-0000-1000-8000-00805f9b34fb";
     private final UUID CCC_UUID = UUID.fromString(CCC_UUID_STR);
     private BluetoothAdapter bluetoothAdapter;
@@ -59,15 +69,27 @@ public class MainActivity extends AppCompatActivity {
     private static final long SCAN_PERIOD = 10_000;
     private static final int REQUEST_PERMISSIONS = 1001;
 
-    // ==== UI 元素 ====
-    private Button btnScan, btnAwsSettings, btnConnectAws;
+    // ==== UI elements ====
+    private Button btnScan, btnAwsSettings, btnConnectAws, btnDiagnoseAws;
     private ListView listViewDevices;
     private ArrayAdapter<String> adapter;
     private List<BluetoothDevice> deviceList = new ArrayList<>();
     private TextView tvConnectionStatus, tvReceivedData;
     private ToggleButton toggleReceive;
+    
+    // BLE data sending test controls
+    private EditText etSendData;
+    private Button btnSendData, btnClearLog, btnCopyLog, btnDetailedLog;
+    private Spinner spinnerSendType, spinnerReceiveType;
+    private boolean detailedLoggingEnabled = false;
+    
+    // Data type constants
+    private static final String[] DATA_TYPES = {"UTF-8 Text", "Hexadecimal", "Byte Array"};
+    private static final int TYPE_UTF8 = 0;
+    private static final int TYPE_HEX = 1;
+    private static final int TYPE_BYTES = 2;
 
-    // ==== AWS IoT 配置常量 ====
+    // ==== AWS IoT constants ====
     private static final String PREFS_NAME        = "AwsPrefs";
     private static final String KEY_ENDPOINT      = "endpoint";
     private static final String KEY_KEY_URI       = "keyUri";
@@ -85,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        // 绑定视图
+        // bind views
         btnScan            = findViewById(R.id.btnScan);
         listViewDevices    = findViewById(R.id.listViewDevices);
         tvConnectionStatus = findViewById(R.id.tvConnectionStatus);
@@ -94,42 +116,81 @@ public class MainActivity extends AppCompatActivity {
         tvReceivedData     = findViewById(R.id.tvReceivedData);
         btnAwsSettings     = findViewById(R.id.btnAwsSettings);
         btnConnectAws      = findViewById(R.id.btnConnectAws);
+        btnDiagnoseAws     = findViewById(R.id.btnDiagnoseAws);
+        
+        // BLE data sending test controls binding
+        etSendData         = findViewById(R.id.etSendData);
+        btnSendData        = findViewById(R.id.btnSendData);
+        btnClearLog        = findViewById(R.id.btnClearLog);
+        btnCopyLog         = findViewById(R.id.btnCopyLog);
+        btnDetailedLog     = findViewById(R.id.btnDetailedLog);
+        spinnerSendType    = findViewById(R.id.spinnerSendType);
+        spinnerReceiveType = findViewById(R.id.spinnerReceiveType);
+
+        // set Spinner adapter
+        ArrayAdapter<String> dataTypeAdapter = new ArrayAdapter<>(this, 
+            android.R.layout.simple_spinner_item, DATA_TYPES);
+        dataTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerSendType.setAdapter(dataTypeAdapter);
+        spinnerReceiveType.setAdapter(dataTypeAdapter);
+        
+        // default selection UTF-8
+        spinnerSendType.setSelection(TYPE_UTF8);
+        spinnerReceiveType.setSelection(TYPE_UTF8);
+        
+        // set initial input hint
+        updateInputHint(TYPE_UTF8);
+        
+        // set send type change listener, update input box hint
+        spinnerSendType.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, android.view.View view, int position, long id) {
+                updateInputHint(position);
+            }
+            
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {
+            }
+        });
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, new ArrayList<>());
         listViewDevices.setAdapter(adapter);
 
-        // AWS 设置页面跳转
+        // AWS settings page jump
         btnAwsSettings.setOnClickListener(v ->
-                startActivity(new Intent(MainActivity.this, AwsSettingsActivity.class))
+                startActivity(new Intent(MainActivity.this, AWSSettingsActivity.class))
         );
 
-        // 点击后触发 AWS IoT 连接
+        // click to trigger AWS IoT connection
         btnConnectAws.setOnClickListener(v -> connectAwsIot());
+        
+        // click to diagnose connection
+        btnDiagnoseAws.setOnClickListener(v -> diagnoseAwsConnection());
 
-        // BLE 初始化
+        // BLE initialization
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
-            Toast.makeText(this, "请先打开蓝牙", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Please enable Bluetooth first", Toast.LENGTH_LONG).show();
             finish();
             return;
         }
         bleScanner = bluetoothAdapter.getBluetoothLeScanner();
 
-        // 请求定位 & 蓝牙权限
+        // Request location & Bluetooth permissions
         checkAndRequestPermissions();
 
-        // 扫描按钮逻辑
+        // scan button logic
         btnScan.setOnClickListener(v -> {
             if (!scanning) startBleScan();
             else           stopBleScan();
         });
 
-        // 点击列表设备连接
+        // click to connect device
         listViewDevices.setOnItemClickListener((parent, view, position, id) ->
                 connectToDevice(deviceList.get(position))
         );
 
-        // 收发切换
+        // receive/send switch
         toggleReceive.setOnCheckedChangeListener((btn, isChecked) -> {
             if (notifyCharacteristic == null || bluetoothGatt == null) return;
             if (isChecked) {
@@ -139,14 +200,33 @@ public class MainActivity extends AppCompatActivity {
                 stopReceiving();
             }
         });
+
+        // BLE data sending test button event
+        btnSendData.setOnClickListener(v -> {
+            String data = etSendData.getText().toString().trim();
+            if (!data.isEmpty()) {
+                sendTestData(data);
+                etSendData.setText(""); // Clear input field
+            } else {
+                Toast.makeText(this, "Please enter data to send", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        btnClearLog.setOnClickListener(v -> tvReceivedData.setText(""));
+        
+        // Copy log button
+        btnCopyLog.setOnClickListener(v -> copyLogToClipboard());
+        
+        // Detailed log toggle button
+        btnDetailedLog.setOnClickListener(v -> toggleDetailedLogging());
     }
 
-    /** ← 新增：供外部访问 BLE Scanner */
+    /** Added: External access to BLE Scanner */
     public BluetoothLeScanner getBleScanner() {
         return bleScanner;
     }
 
-    // ===== BLE 方法集 =====
+    // ===== BLE methods =====
 
     private void checkAndRequestPermissions() {
         List<String> perms = new ArrayList<>();
@@ -185,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
     private void startBleScan() {
         deviceList.clear();
         adapter.clear();
-        btnScan.setText("停止扫描");
+        btnScan.setText("stop scan");
         scanning = true;
         handler.postDelayed(this::stopBleScan, SCAN_PERIOD);
         bleScanner.startScan(scanCallback);
@@ -193,17 +273,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void stopBleScan() {
         bleScanner.stopScan(scanCallback);
-        btnScan.setText("扫描 BLE 设备");
+        btnScan.setText("scan BLE devices");
         scanning = false;
     }
 
     private void connectToDevice(BluetoothDevice device) {
-        runOnUiThread(() -> {
-            tvConnectionStatus.setText("状态：连接中...");
-            toggleReceive.setEnabled(false);
-            toggleReceive.setChecked(false);
-            tvReceivedData.setText("");
-        });
+                        runOnUiThread(() -> {
+                    tvConnectionStatus.setText("BLE: Connecting...");
+                    toggleReceive.setEnabled(false);
+                    toggleReceive.setChecked(false);
+                    tvReceivedData.setText("");
+                });
         bluetoothGatt = device.connectGatt(this, false, gattCallback);
     }
 
@@ -211,13 +291,25 @@ public class MainActivity extends AppCompatActivity {
         @Override public void onConnectionStateChange(@NonNull BluetoothGatt gatt,
                                                       int status, int newState) {
             if (newState == BluetoothGatt.STATE_CONNECTED) {
-                runOnUiThread(() -> tvConnectionStatus.setText("状态：已连接"));
+                runOnUiThread(() -> {
+                    tvConnectionStatus.setText("BLE: Connected");
+                    // Enable send test controls
+                    etSendData.setEnabled(true);
+                    btnSendData.setEnabled(true);
+                    spinnerSendType.setEnabled(true);
+                    spinnerReceiveType.setEnabled(true);
+                });
                 gatt.discoverServices();
             } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
                 runOnUiThread(() -> {
-                    tvConnectionStatus.setText("状态：已断开");
+                    tvConnectionStatus.setText("BLE: Disconnected");
                     toggleReceive.setEnabled(false);
                     toggleReceive.setChecked(false);
+                    // Disable send test controls
+                    etSendData.setEnabled(false);
+                    btnSendData.setEnabled(false);
+                    spinnerSendType.setEnabled(false);
+                    spinnerReceiveType.setEnabled(false);
                 });
                 gatt.close();
             }
@@ -246,8 +338,102 @@ public class MainActivity extends AppCompatActivity {
 
         @Override public void onCharacteristicChanged(@NonNull BluetoothGatt gatt,
                                                       @NonNull BluetoothGattCharacteristic characteristic) {
-            String data = new String(characteristic.getValue(), StandardCharsets.UTF_8);
-            runOnUiThread(() -> tvReceivedData.append(data + "\n"));
+            byte[] rawData = characteristic.getValue();
+            String deviceAddress = gatt.getDevice().getAddress();
+            String deviceName = gatt.getDevice().getName();
+            
+            runOnUiThread(() -> {
+                // 1. Display data according to selected receive type
+                int receiveType = spinnerReceiveType.getSelectedItemPosition();
+                String displayData;
+                String formatName = DATA_TYPES[receiveType];
+                
+                switch (receiveType) {
+                    case TYPE_UTF8:
+                        displayData = new String(rawData, StandardCharsets.UTF_8);
+                        break;
+                    case TYPE_HEX:
+                        displayData = byteArrayToHexString(rawData);
+                        break;
+                    case TYPE_BYTES:
+                        displayData = byteArrayToString(rawData);
+                        break;
+                    default:
+                        displayData = new String(rawData, StandardCharsets.UTF_8);
+                        formatName = DATA_TYPES[TYPE_UTF8];
+                        break;
+                }
+                
+                String timestamp = new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+                    .format(new java.util.Date());
+                appendLog(String.format("[%s] Received (%s): %s (%d bytes)", 
+                    timestamp, formatName, displayData, rawData.length));
+                
+                // 2. Forward to AWS IoT (using UTF-8 format)
+                appendDetailedLog("Checking MQTT forwarding conditions...");
+                appendDetailedLog("mqttManager status: " + (mqttManager != null ? "Initialized" : "Not initialized"));
+                
+                if (mqttManager != null) {
+                    try {
+                        String utf8Data = new String(rawData, StandardCharsets.UTF_8);
+                        String cleanDeviceName = deviceName != null ? deviceName : "Unknown";
+                        
+                        appendDetailedLog("Raw data: '" + utf8Data + "'");
+                        appendDetailedLog("Data length: " + rawData.length + " bytes");
+                        
+                        // Check if temperature data (format: T1:23.5C)
+                        String jsonMessage;
+                        boolean isTemperatureData = utf8Data.matches("T\\d+:[\\d.]+C");
+                        appendDetailedLog("Temperature data match: " + isTemperatureData);
+                        
+                        if (isTemperatureData) {
+                            appendDetailedLog("Processing temperature data...");
+                            // Parse temperature data
+                            String[] parts = utf8Data.split(":");
+                            String sampleNumber = parts[0].substring(1); // Remove 'T'
+                            String temperature = parts[1].replace("C", "");
+                            
+                            appendDetailedLog("Sample number: " + sampleNumber + ", Temperature: " + temperature);
+                            
+                            jsonMessage = String.format(
+                                "{\"device\":\"%s\",\"deviceName\":\"%s\",\"timestamp\":\"%s\",\"type\":\"temperature\",\"sampleNumber\":%s,\"temperature\":%s,\"unit\":\"C\",\"rawData\":\"%s\"}", 
+                                escapeJsonString(deviceAddress),
+                                escapeJsonString(cleanDeviceName),
+                                getIsoTimestamp(),
+                                sampleNumber,
+                                temperature,
+                                escapeJsonString(utf8Data)
+                            );
+                        } else {
+                            appendDetailedLog("Processing general sensor data...");
+                            // General sensor data
+                            jsonMessage = String.format(
+                                "{\"device\":\"%s\",\"deviceName\":\"%s\",\"timestamp\":\"%s\",\"data\":\"%s\",\"dataLength\":%d,\"type\":\"sensor_data\"}", 
+                                escapeJsonString(deviceAddress),
+                                escapeJsonString(cleanDeviceName),
+                                getIsoTimestamp(),
+                                escapeJsonString(utf8Data),
+                                rawData.length
+                            );
+                        }
+                        
+                        // Send to AWS IoT
+                        String topic = "devices/" + deviceAddress.replace(":", "") + "/data";
+                        appendDetailedLog("Preparing to send to topic: " + topic);
+                        appendDetailedLog("JSON content: " + jsonMessage);
+                        
+                        mqttManager.publishString(jsonMessage, topic, AWSIotMqttQos.QOS0);
+                        appendLog("→ Sent to AWS IoT: " + topic);
+                        
+                    } catch (Exception e) {
+                        appendLog("→ MQTT send failed: " + e.getClass().getSimpleName());
+                        appendDetailedLog("   Error message: " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                } else {
+                    appendLog("→ MQTT manager not initialized, cannot forward data");
+                }
+            });
         }
     };
 
@@ -275,7 +461,7 @@ public class MainActivity extends AppCompatActivity {
         bluetoothGatt.writeCharacteristic(writeCharacteristic);
     }
 
-    // ===== AWS IoT 连接逻辑 =====
+    // ===== AWS IoT connection logic =====
 
     private void connectAwsIot() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -284,7 +470,26 @@ public class MainActivity extends AppCompatActivity {
         String certUriStr = prefs.getString(KEY_CRED_URI, null);
 
         if (endpoint.isEmpty() || keyUriStr == null || certUriStr == null) {
-            Toast.makeText(this, "请先在“AWS IoT 设置”中完成配置", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please configure AWS IoT settings first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // check network connection
+        if (!isNetworkAvailable()) {
+            runOnUiThread(() -> {
+                appendLog("Error: No network connection");
+                appendLog("Please check WiFi or mobile data connection");
+                tvAwsStatus.setText("AWS: Network Error");
+            });
+            return;
+        }
+
+        // verify Endpoint format
+        if (!isValidEndpoint(endpoint)) {
+            runOnUiThread(() -> {
+                appendLog("Error: Endpoint format incorrect");
+                appendLog("Correct format: xxxxxx-ats.iot.region.amazonaws.com");
+            });
             return;
         }
 
@@ -292,65 +497,140 @@ public class MainActivity extends AppCompatActivity {
         Uri certUri = Uri.parse(certUriStr);
         String keystorePath = getFilesDir().getAbsolutePath();
 
+        runOnUiThread(() -> {
+            appendLog("Starting AWS IoT connection...");
+            appendLog("Endpoint: " + endpoint);
+            tvAwsStatus.setText("AWS: Connecting...");
+        });
+
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
+                // Verify and load certificates
+                runOnUiThread(() -> appendLog("Verifying certificate files..."));
+                
+                String certPem = slurp(getContentResolver().openInputStream(certUri));
+                String keyPem  = slurp(getContentResolver().openInputStream(keyUri));
+                
+                // Verify certificate format
+                if (!isValidCertificate(certPem)) {
+                    runOnUiThread(() -> appendLog("Error: Certificate file format invalid"));
+                    return;
+                }
+                
+                if (!isValidPrivateKey(keyPem)) {
+                    runOnUiThread(() -> appendLog("Error: Private key file format invalid"));
+                    return;
+                }
+
+                runOnUiThread(() -> appendLog("Certificate files verified successfully"));
+
+                // Create or load keystore
                 if (!AWSIotKeystoreHelper.isKeystorePresent(keystorePath, KEYSTORE_NAME)) {
-                    String certPem = slurp(getContentResolver().openInputStream(certUri));
-                    String keyPem  = slurp(getContentResolver().openInputStream(keyUri));
+                    runOnUiThread(() -> appendLog("Creating new keystore..."));
                     AWSIotKeystoreHelper.saveCertificateAndPrivateKey(
                             CERTIFICATE_ID, certPem, keyPem,
                             keystorePath, KEYSTORE_NAME, KEYSTORE_PASSWORD
                     );
+                } else {
+                    runOnUiThread(() -> appendLog("Using existing keystore"));
                 }
+
                 KeyStore ks = AWSIotKeystoreHelper.getIotKeystore(
                         CERTIFICATE_ID, keystorePath, KEYSTORE_NAME, KEYSTORE_PASSWORD
                 );
-                String clientId = UUID.randomUUID().toString();
+
+                runOnUiThread(() -> appendLog("Keystore loaded successfully"));
+
+                // Create MQTT manager
+                String clientId = "BleGateway_" + System.currentTimeMillis();
+                runOnUiThread(() -> appendLog("Client ID: " + clientId));
+                
                 mqttManager = new AWSIotMqttManager(clientId, endpoint);
-                mqttManager.setKeepAlive(10);
+                
+                // Set connection parameters
+                mqttManager.setKeepAlive(30);  // Increase keep-alive time
+                
+                runOnUiThread(() -> appendLog("Starting MQTT connection..."));
+
                 mqttManager.connect(ks, new AWSIotMqttClientStatusCallback() {
                     @Override
                     public void onStatusChanged(AWSIotMqttClientStatus status, Throwable throwable) {
                         runOnUiThread(() -> {
-                            Toast.makeText(
-                                    MainActivity.this,
-                                    "AWS IoT 连接状态: " + status,
-                                    Toast.LENGTH_SHORT
-                            ).show();
-
-                            // —— 新增：更新右侧状态栏 ——
+                            String statusMsg = "AWS IoT Status: " + status.name();
                             tvAwsStatus.setText("AWS: " + status.name());
+                            appendLog("Connection status changed: " + status.name());
 
-                            // 如果连接成功，发布 "connected" 并写日志
-                            if (status == AWSIotMqttClientStatus.Connected) {
-                                try {
-                                    String topic = "test/bleawsgateway";
-                                    mqttManager.publishString(
-                                            "connected",
-                                            topic,
-                                            AWSIotMqttQos.QOS0
-                                    );
-                                    // —— 在日志框追加 ——
-                                    tvReceivedData.append("AWS connected → topic: " + topic + "\n");
-                                } catch (Exception e) {
-                                    tvReceivedData.append("AWS publish error: " + e.getMessage() + "\n");
-                                    e.printStackTrace();
-                                }
-                            } else if (status == AWSIotMqttClientStatus.ConnectionLost && throwable != null) {
-                                // 连接断开或失败时，也记录一下
-                                tvReceivedData.append("AWS error: " + throwable.getMessage() + "\n");
+                            switch (status) {
+                                case Connecting:
+                                    appendLog("Establishing connection...");
+                                    break;
+                                    
+                                case Connected:
+                                    appendLog("AWS IoT connected successfully!");
+                                    Toast.makeText(MainActivity.this, "AWS IoT connected successfully", Toast.LENGTH_SHORT).show();
+                                    
+                                    // Send test message
+                                    try {
+                                        String topic = "test/bleawsgateway";
+                                        String jsonMessage = String.format(
+                                            "{\"message\":\"Gateway connected\",\"timestamp\":\"%s\",\"status\":\"online\",\"type\":\"connection\"}",
+                                            getIsoTimestamp()
+                                        );
+                                        mqttManager.publishString(jsonMessage, topic, AWSIotMqttQos.QOS0);
+                                        appendLog("Test message sent to: " + topic);
+                                    } catch (Exception e) {
+                                        appendLog("Test message failed: " + e.getMessage());
+                                    }
+                                    break;
+                                    
+                                case Reconnecting:
+                                    appendLog("Connection lost, reconnecting...");
+                                    break;
+                                    
+                                case ConnectionLost:
+                                    appendLog("Connection lost");
+                                    if (throwable != null) {
+                                        appendLog("Reason: " + throwable.getMessage());
+                                        throwable.printStackTrace();
+                                    }
+                                    break;
+                                    
+                                default:
+                                    if (throwable != null) {
+                                        appendLog("Connection error: " + throwable.getClass().getSimpleName());
+                                        appendLog("Error details: " + throwable.getMessage());
+                                        
+                                        // Common error solutions
+                                        String errorMsg = throwable.getMessage();
+                                        if (errorMsg != null) {
+                                            if (errorMsg.contains("certificate")) {
+                                                appendLog("Suggestion: Check certificate files");
+                                            } else if (errorMsg.contains("endpoint")) {
+                                                appendLog("Suggestion: Check Endpoint address format");
+                                            } else if (errorMsg.contains("network") || errorMsg.contains("timeout")) {
+                                                appendLog("Suggestion: Check network connection");
+                                            } else if (errorMsg.contains("authorization") || errorMsg.contains("forbidden")) {
+                                                appendLog("Suggestion: Check device certificate permissions");
+                                            }
+                                        }
+                                        throwable.printStackTrace();
+                                    }
+                                    break;
                             }
                         });
                     }
                 });
+
             } catch (Exception e) {
-                runOnUiThread(() ->
-                        Toast.makeText(
-                                MainActivity.this,
-                                "AWS 连接异常: " + e.getMessage(),
-                                Toast.LENGTH_LONG
-                        ).show()
-                );
+                runOnUiThread(() -> {
+                    appendLog("AWS connection exception: " + e.getClass().getSimpleName());
+                    appendLog("Error message: " + e.getMessage());
+                    
+                    tvAwsStatus.setText("AWS: Connection Failed");
+                    
+                    Toast.makeText(MainActivity.this, "AWS connection failed: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                });
             }
         });
     }
@@ -363,11 +643,264 @@ public class MainActivity extends AppCompatActivity {
         return baos.toString(StandardCharsets.UTF_8.name());
     }
 
+    private void sendTestData(String data) {
+        if (writeCharacteristic == null || bluetoothGatt == null) {
+            Toast.makeText(this, "Please connect to device first", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        try {
+            byte[] dataBytes;
+            int sendType = spinnerSendType.getSelectedItemPosition();
+            
+            switch (sendType) {
+                case TYPE_UTF8:
+                    dataBytes = data.getBytes(StandardCharsets.UTF_8);
+                    break;
+                case TYPE_HEX:
+                    dataBytes = hexStringToByteArray(data);
+                    if (dataBytes == null) {
+                        Toast.makeText(this, "Hex format error! Please enter even number of characters, e.g.: 41424344", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    break;
+                case TYPE_BYTES:
+                    dataBytes = parseByteArray(data);
+                    if (dataBytes == null) {
+                        Toast.makeText(this, "Byte array format error! Please use comma-separated values 0-255, e.g.: 65,66,67,68", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+                    break;
+                default:
+                    dataBytes = data.getBytes(StandardCharsets.UTF_8);
+                    break;
+            }
+            
+            writeCharacteristic.setValue(dataBytes);
+            boolean success = bluetoothGatt.writeCharacteristic(writeCharacteristic);
+            
+            if (success) {
+                String timestamp = new java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault())
+                    .format(new java.util.Date());
+                String formatName = DATA_TYPES[sendType];
+                tvReceivedData.append(String.format("[%s] send data(%s): %s (%d bytes)\n", 
+                    timestamp, formatName, data, dataBytes.length));
+            } else {
+                tvReceivedData.append("send data failed: BLE write operation failed\n");
+            }
+        } catch (Exception e) {
+            tvReceivedData.append("send data exception: " + e.getMessage() + "\n");
+            e.printStackTrace();
+        }
+    }
+    
+    // hex string to byte array
+    private byte[] hexStringToByteArray(String hexString) {
+        try {
+            hexString = hexString.replaceAll("\\s+", ""); // remove spaces
+            if (hexString.length() % 2 != 0) {
+                return null; // length must be even
+            }
+            
+            byte[] result = new byte[hexString.length() / 2];
+            for (int i = 0; i < hexString.length(); i += 2) {
+                result[i / 2] = (byte) Integer.parseInt(hexString.substring(i, i + 2), 16);
+            }
+            return result;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
+    // parse byte array string (e.g.: 65,66,67,68)
+    private byte[] parseByteArray(String byteString) {
+        try {
+            String[] parts = byteString.split(",");
+            byte[] result = new byte[parts.length];
+            for (int i = 0; i < parts.length; i++) {
+                int value = Integer.parseInt(parts[i].trim());
+                if (value < 0 || value > 255) {
+                    return null; // byte value must be in range 0-255
+                }
+                result[i] = (byte) value;
+            }
+            return result;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    // byte array to hex string
+    private String byteArrayToHexString(byte[] bytes) {
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            String hex = Integer.toHexString(0xFF & b);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+
+    // byte array to string (e.g.: 65,66,67,68)
+    private String byteArrayToString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(b).append(",");
+        }
+        if (sb.length() > 0) {
+            sb.deleteCharAt(sb.length() - 1); // remove last comma
+        }
+        return sb.toString();
+    }
+
+    private void updateInputHint(int position) {
+        String hint = "";
+        switch (position) {
+            case TYPE_UTF8:
+                hint = "Enter UTF-8 text";
+                break;
+            case TYPE_HEX:
+                hint = "Enter hex string (e.g.: 41424344)";
+                break;
+            case TYPE_BYTES:
+                hint = "Enter byte array (e.g.: 65,66,67,68)";
+                break;
+        }
+        etSendData.setHint(hint);
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // 可根据需要在此处理权限授予结果
+        // handle permission grant results as needed
+    }
+
+    // verify Endpoint format
+    private boolean isValidEndpoint(String endpoint) {
+        return endpoint.matches("^[a-zA-Z0-9]+-ats\\.iot\\.[a-z0-9-]+\\.amazonaws\\.com$");
+    }
+
+    // verify certificate format
+    private boolean isValidCertificate(String certPem) {
+        return certPem != null && 
+               certPem.contains("-----BEGIN CERTIFICATE-----") && 
+               certPem.contains("-----END CERTIFICATE-----");
+    }
+
+    // verify private key format
+    private boolean isValidPrivateKey(String keyPem) {
+        return keyPem != null && 
+               ((keyPem.contains("-----BEGIN PRIVATE KEY-----") && keyPem.contains("-----END PRIVATE KEY-----")) ||
+                (keyPem.contains("-----BEGIN RSA PRIVATE KEY-----") && keyPem.contains("-----END RSA PRIVATE KEY-----")));
+    }
+    
+    // JSON string escape
+    private String escapeJsonString(String str) {
+        if (str == null) return "null";
+        return str.replace("\\", "\\\\")
+                  .replace("\"", "\\\"")
+                  .replace("\n", "\\n")
+                  .replace("\r", "\\r")
+                  .replace("\t", "\\t");
+    }
+    
+    // get ISO 8601 format timestamp
+    private String getIsoTimestamp() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(new java.util.Date());
+    }
+
+    // network check
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
+    // Check MQTT connection status
+    private boolean isMqttConnected() {
+        return mqttManager != null;
+        // Note: AWS IoT SDK doesn't have direct connection status check method
+        // We can only check if manager is initialized
+    }
+    
+    // Copy log to clipboard
+    private void copyLogToClipboard() {
+        String logContent = tvReceivedData.getText().toString();
+        if (logContent.isEmpty()) {
+            Toast.makeText(this, "Log is empty, nothing to copy", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("BLE Gateway Log", logContent);
+        clipboard.setPrimaryClip(clip);
+        
+        Toast.makeText(this, "Log copied to clipboard", Toast.LENGTH_SHORT).show();
+    }
+    
+    // Toggle detailed logging
+    private void toggleDetailedLogging() {
+        detailedLoggingEnabled = !detailedLoggingEnabled;
+        btnDetailedLog.setText(detailedLoggingEnabled ? "Simple Log" : "Detailed Log");
+        String message = detailedLoggingEnabled ? "Detailed logging enabled" : "Simple logging enabled";
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        appendLog("=== " + message + " ===");
+    }
+    
+    // Centralized logging method
+    private void appendLog(String message) {
+        runOnUiThread(() -> tvReceivedData.append(message + "\n"));
+    }
+    
+    // Detailed logging method
+    private void appendDetailedLog(String message) {
+        if (detailedLoggingEnabled) {
+            appendLog(message);
+        }
+    }
+    
+    // AWS connection diagnosis
+    public void diagnoseAwsConnection() {
+        runOnUiThread(() -> {
+            appendLog("=== AWS Connection Diagnosis Started ===");
+            appendLog("Network connection status: " + (isNetworkAvailable() ? "Connected" : "Disconnected"));
+            appendLog("MQTT manager status: " + (mqttManager != null ? "Initialized" : "Not initialized"));
+            appendLog("Endpoint: " + getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_ENDPOINT, "N/A"));
+            appendLog("Certificate file: " + getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_CRED_URI, "N/A"));
+            appendLog("Private key file: " + getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(KEY_KEY_URI, "N/A"));
+            appendLog("Keystore path: " + getFilesDir().getAbsolutePath());
+            appendLog("Certificate ID: " + CERTIFICATE_ID);
+            appendLog("Keystore name: " + KEYSTORE_NAME);
+            
+            // Test sending capability
+            if (mqttManager != null) {
+                try {
+                    String testTopic = "test/diagnosis";
+                    String testMessage = "{\"test\":\"connectivity\",\"timestamp\":\"" + getIsoTimestamp() + "\"}";
+                    mqttManager.publishString(testMessage, testTopic, AWSIotMqttQos.QOS0);
+                    appendLog("Diagnostic message test: Sent to " + testTopic);
+                } catch (Exception e) {
+                    appendLog("Diagnostic message failed: " + e.getMessage());
+                }
+                
+                appendLog("");
+                appendLog("【AWS IoT Console Monitoring Guide】");
+                appendLog("1. Login to AWS IoT Console");
+                appendLog("2. Click 'Test' -> 'MQTT test client' in left menu");
+                appendLog("3. Subscribe to these topics:");
+                appendLog("   - test/# (monitor all test messages)");
+                appendLog("   - devices/# (monitor all device data)");
+                appendLog("   - devices/+/data (monitor device data only)");
+                appendLog("4. Click 'Subscribe' button to start monitoring");
+                appendLog("5. Connect BLE device and send 's' command for temperature data");
+            }
+            appendLog("=== AWS Connection Diagnosis Completed ===");
+        });
     }
 }
