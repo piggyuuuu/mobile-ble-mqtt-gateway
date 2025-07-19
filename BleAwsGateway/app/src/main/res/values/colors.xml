@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App 主色调 -->
+    <!-- App primary colors -->
     <color name="purple_500">#6200EE</color>
     <color name="purple_700">#3700B3</color>
-    <!-- 根据主题需要，可补充： -->
+    <!-- Additional colors can be added as needed: -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
 </resources>

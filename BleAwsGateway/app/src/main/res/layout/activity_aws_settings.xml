@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Endpoint 仍保留为 EditText -->
+        <!-- Endpoint remains as EditText -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -18,13 +18,13 @@
             android:id="@+id/etEndpoint"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="请输入 AWS IoT Endpoint" />
+            android:hint="Enter AWS IoT Endpoint" />
 
-        <!-- Key 文件选择 -->
+        <!-- Key file selection -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Key 文件："
+            android:text="Key File:"
             android:layout_marginTop="12dp" />
         <LinearLayout
             android:layout_width="match_parent"
@@ -36,21 +36,21 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="未选择文件"
+                android:hint="No file selected"
                 android:padding="8dp" />
 
             <Button
                 android:id="@+id/btnSelectKey"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="浏览" />
+                android:text="Browse" />
         </LinearLayout>
 
-        <!-- Credentials 文件选择 -->
+        <!-- Credentials file selection -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Credentials 文件："
+            android:text="Credentials File:"
             android:layout_marginTop="12dp" />
         <LinearLayout
             android:layout_width="match_parent"
@@ -62,22 +62,22 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:hint="未选择文件"
+                android:hint="No file selected"
                 android:padding="8dp" />
 
             <Button
                 android:id="@+id/btnSelectCred"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="浏览" />
+                android:text="Browse" />
         </LinearLayout>
 
-        <!-- 保存按钮 -->
+        <!-- Save button -->
         <Button
             android:id="@+id/btnSaveSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="保存"
+            android:text="Save"
             android:layout_marginTop="24dp"/>
     </LinearLayout>
 </ScrollView>

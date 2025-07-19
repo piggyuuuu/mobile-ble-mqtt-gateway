@@ -15,7 +15,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class AwsSettingsActivity extends AppCompatActivity {
+public class AWSSettingsActivity extends AppCompatActivity {
     private EditText etEndpoint;
     private TextView tvKeyPath, tvCredPath;
     private Button btnSelectKey, btnSelectCred, btnSave;
@@ -84,7 +84,7 @@ public class AwsSettingsActivity extends AppCompatActivity {
             if (etEndpoint.getText().toString().trim().isEmpty() ||
                     keyUri == null || credUri == null) {
                 Toast.makeText(this,
-                        "请填写 Endpoint 并选择 Key、Credentials 文件",
+                        "Please fill in Endpoint and select Key, Credentials files",
                         Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -93,12 +93,12 @@ public class AwsSettingsActivity extends AppCompatActivity {
             editor.putString(KEY_KEY_URI,  keyUri.toString());
             editor.putString(KEY_CRED_URI, credUri.toString());
             editor.apply();
-            Toast.makeText(this, "AWS IoT 配置已保存", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "AWS IoT configuration saved", Toast.LENGTH_SHORT).show();
             finish();
         });
     }
 
-    /** 从 Uri 中读取显示名称 */
+    /** Read display name from Uri */
     private String getFileName(Uri uri) {
         String result = null;
         ContentResolver cr = getContentResolver();

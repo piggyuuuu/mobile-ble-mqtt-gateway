@@ -10,7 +10,7 @@
         android:id="@+id/btnScan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="扫描 BLE 设备" />
+        android:text="Scan BLE Devices" />
 
     <ListView
         android:id="@+id/listViewDevices"
@@ -18,7 +18,7 @@
         android:layout_height="200dp"
         android:dividerHeight="1dp" />
 
-    <!-- 实时数据区 -->
+    <!-- Real-time data area -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,7 +30,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="BLE: 未连接"
+                android:text="BLE: Disconnected"
                 android:textStyle="bold" />
 
             <TextView
@@ -38,7 +38,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="AWS: 未连接"
+                android:text="AWS: Disconnected"
                 android:textStyle="bold"
                 android:gravity="end" />
         </LinearLayout>
@@ -47,21 +47,149 @@
         android:id="@+id/toggleReceive"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textOff="开始接收"
-        android:textOn="停止接收"
+        android:textOff="Start Receiving"
+        android:textOn="Stop Receiving"
         android:enabled="false" />
+
+    <!-- BLE data testing area -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="BLE Data Testing:"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
+
+    <!-- Send data type selection -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send Format:"
+            android:layout_marginEnd="8dp"
+            android:gravity="center_vertical" />
+
+        <Spinner
+            android:id="@+id/spinnerSendType"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false" />
+    </LinearLayout>
+
+    <!-- Send data input -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <EditText
+            android:id="@+id/etSendData"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Enter data to send..."
+            android:enabled="false" />
+
+        <Button
+            android:id="@+id/btnSendData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send"
+            android:layout_marginStart="8dp"
+            android:enabled="false" />
+    </LinearLayout>
+
+    <!-- Receive data type selection -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Receive Format:"
+            android:layout_marginEnd="8dp"
+            android:gravity="center_vertical" />
+
+        <Spinner
+            android:id="@+id/spinnerReceiveType"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:enabled="false" />
+    </LinearLayout>
+
     <Button
         android:id="@+id/btnAwsSettings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="AWS IoT 设置"
+        android:text="AWS IoT Settings"
         android:layout_marginTop="8dp"/>
-    <Button
-        android:id="@+id/btnConnectAws"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="连接 AWS IoT"
-        android:layout_marginTop="8dp"/>
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+        
+        <Button
+            android:id="@+id/btnConnectAws"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Connect AWS IoT"
+            android:layout_marginEnd="4dp"/>
+            
+        <Button
+            android:id="@+id/btnDiagnoseAws"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Diagnose"
+            android:layout_marginStart="4dp"/>
+    </LinearLayout>
+    
+        <!-- Log control buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
+
+        <Button
+            android:id="@+id/btnDetailedLog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Detailed Log"
+            android:textSize="12sp"
+            android:layout_marginEnd="8dp" />
+            
+        <Button
+            android:id="@+id/btnCopyLog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Copy Log"
+            android:textSize="12sp"
+            android:layout_marginEnd="8dp" />
+            
+        <Button
+            android:id="@+id/btnClearLog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear Log"
+            android:textSize="12sp" />
+    </LinearLayout>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -75,7 +203,7 @@
             android:layout_height="wrap_content"
             android:text="" />
     </ScrollView>
-    <!-- 新增：跳转到 AWS IoT 设置的按钮 -->
+    <!-- Added: Button to jump to AWS IoT settings -->
 
 
     
