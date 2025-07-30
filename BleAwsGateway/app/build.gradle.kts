@@ -48,4 +48,6 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.3.0")
     implementation("com.amazonaws:aws-android-sdk-iot:2.46.0")
     implementation("com.google.android.material:material:1.8.0")
+    // 图表库用于实时性能监控
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }
