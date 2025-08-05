@@ -108,16 +108,16 @@ public class MultiDeviceActivity extends AppCompatActivity implements BleDataLis
             @Override
             public void onScanStarted() {
                 mainHandler.post(() -> {
-                    tvScanStatus.setText("扫描中...");
-                    btnScan.setText("停止扫描");
+                    tvScanStatus.setText("Scanning...");
+                    btnScan.setText("Stop Scan");
                 });
             }
             
             @Override
             public void onScanStopped() {
                 mainHandler.post(() -> {
-                    tvScanStatus.setText("扫描已停止");
-                    btnScan.setText("开始扫描");
+                    tvScanStatus.setText("Scan Stopped");
+                    btnScan.setText("begin Scanning");
                 });
             }
         });
@@ -167,9 +167,9 @@ public class MultiDeviceActivity extends AppCompatActivity implements BleDataLis
     
     private void connectDevice(BluetoothDevice device) {
         if (bleManager.connectToDevice(device)) {
-            Toast.makeText(this, "正在连接设备: " + device.getName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Connecting device: " + device.getName(), Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(this, "连接失败", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Connect failed", Toast.LENGTH_SHORT).show();
         }
     }
     
@@ -182,17 +182,17 @@ public class MultiDeviceActivity extends AppCompatActivity implements BleDataLis
                 }
             }
         }
-        Toast.makeText(this, "尝试连接 " + connectedCount + " 个设备", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "try to connect " + connectedCount + " devices", Toast.LENGTH_SHORT).show();
     }
     
     private void disconnectDevice(String deviceAddress) {
         bleManager.disconnectDevice(deviceAddress);
-        Toast.makeText(this, "断开设备连接", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Disconnect device", Toast.LENGTH_SHORT).show();
     }
     
     private void disconnectAllDevices() {
         bleManager.disconnectAllDevices();
-        Toast.makeText(this, "断开所有设备连接", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Disconnect all devices", Toast.LENGTH_SHORT).show();
     }
     
     private void updateConnectionStatus() {
@@ -209,8 +209,8 @@ public class MultiDeviceActivity extends AppCompatActivity implements BleDataLis
             connectedAdapter.add(deviceInfo);
         }
         
-        tvConnectionStatus.setText("已连接设备: " + connectedAddresses.size());
-        tvConnectionPool.setText(String.format("连接池: %d/%d", 
+        tvConnectionStatus.setText("Connected devices: " + connectedAddresses.size());
+        tvConnectionPool.setText(String.format("connection pool: %d/%d",
             bleManager.getActiveConnectionCount(), bleManager.getMaxConnectionCount()));
     }
     
@@ -227,8 +227,8 @@ public class MultiDeviceActivity extends AppCompatActivity implements BleDataLis
     @Override
     public void onConnectionStateChanged(String deviceAddress, boolean isConnected, String deviceName) {
         mainHandler.post(() -> {
-            String status = isConnected ? "已连接" : "已断开";
-            String message = String.format("设备 %s (%s) %s", deviceName, deviceAddress, status);
+            String status = isConnected ? "connected" : "not connected";
+            String message = String.format("device %s (%s) %s", deviceName, deviceAddress, status);
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
             
             updateConnectionStatus();
@@ -239,7 +239,7 @@ public class MultiDeviceActivity extends AppCompatActivity implements BleDataLis
     public void onError(String error, String deviceAddress) {
         mainHandler.post(() -> {
             String message = deviceAddress != null ? 
-                String.format("错误 [%s]: %s", deviceAddress, error) : error;
+                String.format("error [%s]: %s", deviceAddress, error) : error;
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
             Log.e(TAG, message);
         });
@@ -248,7 +248,7 @@ public class MultiDeviceActivity extends AppCompatActivity implements BleDataLis
     @Override
     public void onDataSent(String deviceAddress, byte[] data) {
         mainHandler.post(() -> {
-            String message = String.format("数据已发送到设备 %s", deviceAddress);
+            String message = String.format("Data send to %s", deviceAddress);
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
         });
     }
@@ -259,9 +259,9 @@ public class MultiDeviceActivity extends AppCompatActivity implements BleDataLis
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSIONS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "权限已授予", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "需要蓝牙权限才能使用此功能", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Requires Bluetooth permission", Toast.LENGTH_SHORT).show();
             }
         }
     }

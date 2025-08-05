@@ -17,7 +17,7 @@
    - 已实现点击监听器：
    ```java
    btnBleScan.setOnClickListener(v -> {
-       Toast.makeText(this, "正在跳转到BLE扫描界面...", Toast.LENGTH_SHORT).show();
+       Toast.makeText(this, "Jumping to the BLE scanning interface...", Toast.LENGTH_SHORT).show();
        startActivity(new Intent(MainActivity.this, BleScanActivity.class));
    });
    ```
@@ -32,7 +32,7 @@
    ```xml
    <activity
        android:name=".BleScanActivity"
-       android:label="BLE设备扫描"/>
+       android:label="BLE device Scan"/>
    ```
 
 6. **布局文件**

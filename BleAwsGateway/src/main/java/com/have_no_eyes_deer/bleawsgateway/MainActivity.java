@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvConnectionStatus, tvReceivedData;
     private ToggleButton toggleReceive;
     
-    // 当前选中的设备
+    // 当前选中的设备 BLE设备扫描
     private String selectedDeviceAddress = null;
     
     // BLE data sending test controls
@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
         
         // 跳转到BLE扫描界面
         btnBleScan.setOnClickListener(v -> {
-            Toast.makeText(this, "正在跳转到BLE扫描界面...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Jumpping to the BLE scanning interface...", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(MainActivity.this, BleScanActivity.class));
         });
 
@@ -1655,7 +1655,7 @@ public class MainActivity extends AppCompatActivity {
         }
         
         // 更新连接状态显示
-        tvConnectionStatus.setText("BLE: " + connectedAddresses.length + " 设备已连接");
+        tvConnectionStatus.setText("BLE: " + connectedAddresses.length + " devices connected");
         
         // 更新快速发送按钮状态
         updateQuickSendButtons();
@@ -1690,12 +1690,12 @@ public class MainActivity extends AppCompatActivity {
      */
     private void sendQuickCommand(String command) {
         if (selectedDeviceAddress == null) {
-            Toast.makeText(this, "请先选择一个已连接的设备", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select an already connected device first.", Toast.LENGTH_SHORT).show();
             return;
         }
         
         if (!bleManager.isDeviceConnected(selectedDeviceAddress)) {
-            Toast.makeText(this, "设备已断开连接", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "The device has been disconnected.", Toast.LENGTH_SHORT).show();
             selectedDeviceAddress = null;
             updateQuickSendButtons();
             return;
@@ -1704,11 +1704,11 @@ public class MainActivity extends AppCompatActivity {
         // 发送UTF-8字符串
         boolean success = bleManager.sendCommand(selectedDeviceAddress, command);
         if (success) {
-            appendLog("发送命令 '" + command + "' 到设备: " + selectedDeviceAddress);
-            Toast.makeText(this, "命令已发送: " + command, Toast.LENGTH_SHORT).show();
+            appendLog("Send command- '" + command + "' to: " + selectedDeviceAddress);
+            Toast.makeText(this, "Command has been sent: " + command, Toast.LENGTH_SHORT).show();
         } else {
-            appendLog("发送命令失败: " + command);
-            Toast.makeText(this, "发送失败", Toast.LENGTH_SHORT).show();
+            appendLog("Command send failed: " + command);
+            Toast.makeText(this, "fail to send", Toast.LENGTH_SHORT).show();
         }
     }
     
@@ -1718,10 +1718,10 @@ public class MainActivity extends AppCompatActivity {
     private void showDeviceOptionsDialog(String deviceAddress) {
         String deviceName = getDeviceNameByAddress(deviceAddress);
         
-        String[] options = {"查看设备信息", "断开连接"};
+        String[] options = {"Device Info", "Disconnect the device"};
         
         new AlertDialog.Builder(this)
-            .setTitle("设备操作: " + deviceName)
+            .setTitle("equipment operation: " + deviceName)
             .setItems(options, (dialog, which) -> {
                 switch (which) {
                     case 0: // 查看设备信息
@@ -1732,7 +1732,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                 }
             })
-            .setNegativeButton("取消", null)
+            .setNegativeButton("cancel", null)
             .show();
     }
     
@@ -1746,18 +1746,18 @@ public class MainActivity extends AppCompatActivity {
         if (info == null) return;
         
         StringBuilder infoText = new StringBuilder();
-        infoText.append("设备名称: ").append(info.deviceName).append("\n");
-        infoText.append("设备地址: ").append(info.deviceAddress).append("\n");
-        infoText.append("连接时间: ").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault())
+        infoText.append("device name: ").append(info.deviceName).append("\n");
+        infoText.append("address: ").append(info.deviceAddress).append("\n");
+        infoText.append("connect time: ").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault())
             .format(new java.util.Date(info.connectTime))).append("\n");
-        infoText.append("连接状态: ").append(info.state.name()).append("\n");
-        infoText.append("重连次数: ").append(info.reconnectAttempts).append("\n");
-        infoText.append("是否重连中: ").append(info.isReconnecting ? "是" : "否");
+        infoText.append("connect state: ").append(info.state.name()).append("\n");
+            infoText.append("reconnection attempts: ").append(info.reconnectAttempts).append("\n");
+        infoText.append("reconnect or not: ").append(info.isReconnecting ? "Yes" : "No");
         
         new AlertDialog.Builder(this)
-            .setTitle("设备信息")
+            .setTitle("device state")
             .setMessage(infoText.toString())
-            .setPositiveButton("确定", null)
+            .setPositiveButton("comfirm", null)
             .show();
     }
     
@@ -1770,18 +1770,18 @@ public class MainActivity extends AppCompatActivity {
         String deviceName = getDeviceNameByAddress(deviceAddress);
         
         new AlertDialog.Builder(this)
-            .setTitle("断开连接")
-            .setMessage("确定要断开设备 '" + deviceName + "' 的连接吗？")
-            .setPositiveButton("确定", (dialog, which) -> {
+            .setTitle("disconnect")
+            .setMessage("Do you want to disconnect the device '" + deviceName + "' ？")
+            .setPositiveButton("comfirm", (dialog, which) -> {
                 bleManager.disconnectDevice(deviceAddress);
                 if (selectedDeviceAddress != null && selectedDeviceAddress.equals(deviceAddress)) {
                     selectedDeviceAddress = null;
                     updateQuickSendButtons();
                 }
-                Toast.makeText(this, "已断开设备: " + deviceName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "disconnected device: " + deviceName, Toast.LENGTH_SHORT).show();
                 updateConnectedDevicesList();
             })
-            .setNegativeButton("取消", null)
+            .setNegativeButton("cancel", null)
             .show();
     }
     

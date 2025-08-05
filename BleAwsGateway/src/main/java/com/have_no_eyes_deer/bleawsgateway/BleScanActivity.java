@@ -71,14 +71,14 @@ public class BleScanActivity extends AppCompatActivity {
             this.rssi = rssi;
             this.discoveryTime = System.currentTimeMillis();
             this.isConnected = false;
-            this.connectionStatus = "未连接";
+            this.connectionStatus = "not connected";
         }
 
         @Override
         public String toString() {
             String name = device.getName() != null ? device.getName() : "Unknown Device";
-            String status = isConnected ? "已连接" : connectionStatus;
-            return String.format("%s\n地址: %s\nRSSI: %d dBm\n状态: %s", 
+            String status = isConnected ? "connected" : connectionStatus;
+            return String.format("%s\naddress: %s\nRSSI: %d dBm\nstate: %s",
                 name, device.getAddress(), rssi, status);
         }
 
@@ -134,8 +134,8 @@ public class BleScanActivity extends AppCompatActivity {
             public void onScanStarted() {
                 mainHandler.post(() -> {
                     isScanning = true;
-                    tvScanStatus.setText("扫描中...");
-                    btnScan.setText("停止扫描");
+                    tvScanStatus.setText("Scanning...");
+                    btnScan.setText("Stop Scan");
                 });
             }
 
@@ -143,8 +143,8 @@ public class BleScanActivity extends AppCompatActivity {
             public void onScanStopped() {
                 mainHandler.post(() -> {
                     isScanning = false;
-                    tvScanStatus.setText("扫描已停止");
-                    btnScan.setText("开始扫描");
+                    tvScanStatus.setText("Scan Stopped");
+                    btnScan.setText("Scan beginning");
                 });
             }
         });
@@ -218,12 +218,12 @@ public class BleScanActivity extends AppCompatActivity {
             existingItem.rssi = rssi;
             existingItem.discoveryTime = System.currentTimeMillis();
             existingItem.isConnected = bleManager.isDeviceConnected(address);
-            existingItem.connectionStatus = existingItem.isConnected ? "已连接" : "未连接";
+            existingItem.connectionStatus = existingItem.isConnected ? "connected" : "not connected";
         } else {
             // 添加新设备
             DeviceItem newItem = new DeviceItem(device, rssi);
             newItem.isConnected = bleManager.isDeviceConnected(address);
-            newItem.connectionStatus = newItem.isConnected ? "已连接" : "未连接";
+            newItem.connectionStatus = newItem.isConnected ? "connected" : "not connected";
             
             deviceMap.put(address, newItem);
             discoveredDevices.add(newItem);
@@ -236,38 +236,38 @@ public class BleScanActivity extends AppCompatActivity {
 
     private void connectDevice(DeviceItem item) {
         if (bleManager.connectToDevice(item.device)) {
-            Toast.makeText(this, "正在连接设备: " + item.getDeviceName(), Toast.LENGTH_SHORT).show();
-            item.connectionStatus = "连接中...";
+            Toast.makeText(this, "Connecting the device: " + item.getDeviceName(), Toast.LENGTH_SHORT).show();
+            item.connectionStatus = "connecting...";
             deviceAdapter.notifyDataSetChanged();
         } else {
-            Toast.makeText(this, "连接失败，可能已达到最大连接数", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Connection failed. It may have reached the maximum number of connections.", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void disconnectDevice(DeviceItem item) {
         bleManager.disconnectDevice(item.getDeviceAddress());
-        Toast.makeText(this, "断开设备连接: " + item.getDeviceName(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Disconnect the device connection: " + item.getDeviceName(), Toast.LENGTH_SHORT).show();
         item.isConnected = false;
-        item.connectionStatus = "未连接";
+        item.connectionStatus = "not connected";
         deviceAdapter.notifyDataSetChanged();
     }
 
     private void connectSelectedDevices() {
         int connectedCount = 0;
         for (DeviceItem item : discoveredDevices) {
-            if (!item.isConnected && !item.connectionStatus.equals("连接中...")) {
+            if (!item.isConnected && !item.connectionStatus.equals("connecting...")) {
                 if (bleManager.connectToDevice(item.device)) {
                     connectedCount++;
-                    item.connectionStatus = "连接中...";
+                    item.connectionStatus = "connecting...";
                 }
             }
         }
         
         if (connectedCount > 0) {
-            Toast.makeText(this, "尝试连接 " + connectedCount + " 个设备", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Try to connect " + connectedCount + " devices", Toast.LENGTH_SHORT).show();
             deviceAdapter.notifyDataSetChanged();
         } else {
-            Toast.makeText(this, "没有可连接的设备", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "There are no devices to connect.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -277,28 +277,28 @@ public class BleScanActivity extends AppCompatActivity {
             if (item.isConnected) {
                 bleManager.disconnectDevice(item.getDeviceAddress());
                 item.isConnected = false;
-                item.connectionStatus = "未连接";
+                item.connectionStatus = "not connected";
                 disconnectedCount++;
             }
         }
         
         if (disconnectedCount > 0) {
-            Toast.makeText(this, "断开 " + disconnectedCount + " 个设备连接", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "disconnect " + disconnectedCount + " devices", Toast.LENGTH_SHORT).show();
             deviceAdapter.notifyDataSetChanged();
         } else {
-            Toast.makeText(this, "没有已连接的设备", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "There are no devices to disconnect.", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void showDeviceDetails(DeviceItem item) {
         String details = String.format(
-            "设备详情:\n" +
-            "名称: %s\n" +
-            "地址: %s\n" +
+            "device detail:\n" +
+            "name: %s\n" +
+            "address: %s\n" +
             "RSSI: %d dBm\n" +
-            "发现时间: %s\n" +
-            "连接状态: %s\n" +
-            "设备类型: %s",
+            "diacovered time: %s\n" +
+            "connect state: %s\n" +
+            "device type: %s",
             item.getDeviceName(),
             item.getDeviceAddress(),
             item.rssi,
@@ -316,17 +316,17 @@ public class BleScanActivity extends AppCompatActivity {
             int deviceType = device.getType();
             switch (deviceType) {
                 case BluetoothDevice.DEVICE_TYPE_CLASSIC:
-                    return "经典蓝牙";
+                    return "Classic Bluetooth";
                 case BluetoothDevice.DEVICE_TYPE_LE:
-                    return "低功耗蓝牙";
+                    return "BLE";
                 case BluetoothDevice.DEVICE_TYPE_DUAL:
-                    return "双模蓝牙";
+                    return "Dual-mode Bluetooth";
                 case BluetoothDevice.DEVICE_TYPE_UNKNOWN:
                 default:
-                    return "未知类型";
+                    return "Unknown";
             }
         } catch (Exception e) {
-            return "未知类型";
+            return "Unknown";
         }
     }
 
@@ -339,13 +339,13 @@ public class BleScanActivity extends AppCompatActivity {
             }
         }
         
-        tvDeviceCount.setText(String.format("设备总数: %d (已连接: %d)", totalCount, connectedCount));
+        tvDeviceCount.setText(String.format("Tatol: %d (connected: %d)", totalCount, connectedCount));
     }
 
     private void updateConnectionPoolStatus() {
         int activeConnections = bleManager.getActiveConnectionCount();
         int maxConnections = bleManager.getMaxConnectionCount();
-        tvConnectionPool.setText(String.format("连接池: %d/%d", activeConnections, maxConnections));
+        tvConnectionPool.setText(String.format("Devices: %d/%d", activeConnections, maxConnections));
     }
 
     @Override
@@ -354,9 +354,9 @@ public class BleScanActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_PERMISSIONS) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "权限已授予", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "需要蓝牙权限才能使用此功能", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Requires Bluetooth permission", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -367,7 +367,7 @@ public class BleScanActivity extends AppCompatActivity {
         // 刷新设备状态
         for (DeviceItem item : discoveredDevices) {
             item.isConnected = bleManager.isDeviceConnected(item.getDeviceAddress());
-            item.connectionStatus = item.isConnected ? "已连接" : "未连接";
+            item.connectionStatus = item.isConnected ? "connected" : "not connected";
         }
         deviceAdapter.notifyDataSetChanged();
         updateDeviceCount();

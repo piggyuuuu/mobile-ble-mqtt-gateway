@@ -16,12 +16,12 @@
         android:id="@+id/btnBleScan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="BLE设备扫描" />
+        android:text="BLE Device Scan " />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="已连接的设备:"
+        android:text="Connected devices:"
         android:textStyle="bold"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="4dp" />
