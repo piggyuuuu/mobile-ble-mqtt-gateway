@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="20dp"
+    android:background="@android:color/white">
 
     <!-- 标题栏 -->
     <LinearLayout
@@ -11,22 +12,29 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/status_background"
+        android:padding="16dp">
 
         <Button
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/back"
-            android:layout_marginEnd="8dp" />
+            android:background="@drawable/button_light_blue"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:padding="8dp"
+            android:layout_marginEnd="12dp" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/multi_device_management"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
+            android:textColor="@android:color/black"
             android:gravity="center" />
 
     </LinearLayout>
@@ -36,7 +44,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/status_background"
+        android:padding="16dp">
 
         <Button
             android:id="@+id/btnScan"
@@ -44,13 +54,19 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/start_scan"
-            android:layout_marginEnd="8dp" />
+            android:background="@drawable/button_primary"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:layout_marginEnd="12dp" />
 
         <TextView
             android:id="@+id/tvScanStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/not_scanning"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
             android:gravity="center_vertical" />
 
     </LinearLayout>
@@ -62,14 +78,17 @@
         android:layout_height="wrap_content"
         android:text="@string/connection_pool"
         android:textSize="14sp"
-        android:layout_marginBottom="8dp" />
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/status_background"
+        android:padding="12dp" />
 
     <!-- 批量操作按钮 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="20dp">
 
         <Button
             android:id="@+id/btnConnectAll"
@@ -77,6 +96,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/connect_all"
+            android:background="@drawable/button_primary"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:padding="12dp"
             android:layout_marginEnd="8dp" />
 
         <Button
@@ -84,7 +107,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/disconnect_all" />
+            android:text="@string/disconnect_all"
+            android:background="@drawable/button_secondary"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:padding="12dp" />
 
     </LinearLayout>
 
@@ -101,7 +128,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginEnd="8dp">
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/status_background"
+            android:padding="12dp">
 
             <TextView
                 android:layout_width="match_parent"
@@ -109,14 +138,15 @@
                 android:text="@string/discovered_devices_title"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="12dp" />
 
             <ListView
                 android:id="@+id/listViewDevices"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:background="@android:color/white"
+                android:background="@drawable/results_background"
                 android:divider="@android:color/darker_gray"
                 android:dividerHeight="1dp" />
 
@@ -128,7 +158,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginStart="8dp">
+            android:layout_marginStart="8dp"
+            android:background="@drawable/status_background"
+            android:padding="12dp">
 
             <TextView
                 android:layout_width="match_parent"
@@ -136,14 +168,15 @@
                 android:text="@string/connected_devices_title"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="12dp" />
 
             <ListView
                 android:id="@+id/listViewConnected"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:background="@android:color/white"
+                android:background="@drawable/results_background"
                 android:divider="@android:color/darker_gray"
                 android:dividerHeight="1dp" />
 
@@ -156,7 +189,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="16dp"
+        android:background="@drawable/status_background"
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/tvConnectionStatus"
@@ -164,7 +199,8 @@
             android:layout_height="wrap_content"
             android:text="@string/connected_device_count"
             android:textSize="14sp"
-            android:layout_marginBottom="8dp" />
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="12dp" />
 
         <TextView
             android:layout_width="match_parent"
@@ -172,13 +208,14 @@
             android:text="@string/received_data"
             android:textSize="14sp"
             android:textStyle="bold"
-            android:layout_marginBottom="4dp" />
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="8dp" />
 
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="120dp"
-            android:background="@android:color/white"
-            android:padding="8dp">
+            android:background="@drawable/results_background"
+            android:padding="12dp">
 
             <TextView
                 android:id="@+id/tvReceivedData"
@@ -186,6 +223,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:fontFamily="monospace"
+                android:textColor="@android:color/black"
                 android:text="@string/waiting_for_data" />
 
         </ScrollView>

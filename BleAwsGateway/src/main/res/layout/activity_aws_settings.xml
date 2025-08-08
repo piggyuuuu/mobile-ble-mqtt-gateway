@@ -2,74 +2,166 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    android:padding="20dp"
+    android:background="@android:color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="@android:color/white">
 
-        <!-- Endpoint remains as EditText -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Endpoint:" />
-        <EditText
-            android:id="@+id/etEndpoint"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Enter AWS IoT Endpoint" />
-
-        <!-- Key file selection -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Key File:"
-            android:layout_marginTop="12dp" />
+        <!-- 标题区域 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"
+            android:padding="16dp"
+            android:background="@drawable/status_background">
 
             <TextView
-                android:id="@+id/tvKeyPath"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="No file selected"
-                android:padding="8dp" />
-
-            <Button
-                android:id="@+id/btnSelectKey"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Browse" />
+                android:text="AWS IoT Settings"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Configure AWS IoT Connection"
+                android:textSize="14sp"
+                android:textColor="#666666" />
+        </LinearLayout>
+
+        <!-- Endpoint配置 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/status_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Endpoint:"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+                
+            <EditText
+                android:id="@+id/etEndpoint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Enter AWS IoT Endpoint"
+                android:textColor="@android:color/black"
+                android:background="@drawable/results_background"
+                android:padding="12dp"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <!-- Key file selection -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/status_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Key File:"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+                
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvKeyPath"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="No file selected"
+                    android:textColor="@android:color/black"
+                    android:background="@drawable/results_background"
+                    android:padding="12dp"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnSelectKey"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Browse"
+                    android:background="@drawable/button_light_blue"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    android:padding="12dp" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <!-- Credentials file selection -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Credentials File:"
-            android:layout_marginTop="12dp" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            android:background="@drawable/status_background"
+            android:padding="16dp"
+            android:layout_marginBottom="24dp">
 
             <TextView
-                android:id="@+id/tvCredPath"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="No file selected"
-                android:padding="8dp" />
-
-            <Button
-                android:id="@+id/btnSelectCred"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Browse" />
+                android:text="Credentials File:"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+                
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvCredPath"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="No file selected"
+                    android:textColor="@android:color/black"
+                    android:background="@drawable/results_background"
+                    android:padding="12dp"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnSelectCred"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Browse"
+                    android:background="@drawable/button_light_blue"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    android:padding="12dp" />
+            </LinearLayout>
+
         </LinearLayout>
 
         <!-- Save button -->
@@ -78,6 +170,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Save"
-            android:layout_marginTop="24dp"/>
+            android:background="@drawable/button_primary"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:padding="16dp"/>
     </LinearLayout>
 </ScrollView>

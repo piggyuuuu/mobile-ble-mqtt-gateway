@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="20dp"
+    android:background="@android:color/white">
 
     <!-- 标题栏 -->
     <LinearLayout
@@ -11,22 +12,29 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/status_background"
+        android:padding="16dp">
 
         <Button
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/back"
-            android:layout_marginEnd="8dp" />
+            android:background="@drawable/button_light_blue"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:padding="8dp"
+            android:layout_marginEnd="12dp" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/ble_device_scan_title"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
+            android:textColor="@android:color/black"
             android:gravity="center" />
 
     </LinearLayout>
@@ -36,7 +44,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/status_background"
+        android:padding="16dp">
 
         <Button
             android:id="@+id/btnScan"
@@ -44,13 +54,19 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/start_scan"
-            android:layout_marginEnd="8dp" />
+            android:background="@drawable/button_primary"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:layout_marginEnd="12dp" />
 
         <TextView
             android:id="@+id/tvScanStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/not_scanning"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
             android:gravity="center_vertical" />
 
     </LinearLayout>
@@ -60,7 +76,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/status_background"
+        android:padding="12dp">
 
         <TextView
             android:id="@+id/tvDeviceCount"
@@ -69,6 +87,7 @@
             android:layout_weight="1"
             android:text="@string/device_count"
             android:textSize="14sp"
+            android:textColor="@android:color/black"
             android:layout_marginEnd="8dp" />
 
         <TextView
@@ -76,7 +95,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/connection_pool"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textColor="@android:color/black" />
 
     </LinearLayout>
 
@@ -85,7 +105,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="20dp">
 
         <Button
             android:id="@+id/btnConnectSelected"
@@ -93,6 +113,10 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/connect_all_devices"
+            android:background="@drawable/button_primary"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:padding="12dp"
             android:layout_marginEnd="8dp" />
 
         <Button
@@ -100,7 +124,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/disconnect_all_devices" />
+            android:text="@string/disconnect_all_devices"
+            android:background="@drawable/button_secondary"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:padding="12dp" />
 
     </LinearLayout>
 
@@ -111,7 +139,8 @@
         android:text="@string/discovered_devices"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="12dp" />
 
     <!-- 设备列表 -->
     <ListView
@@ -119,7 +148,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@android:color/white"
+        android:background="@drawable/results_background"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="1dp"
         android:padding="8dp" />
@@ -129,8 +158,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#f0f0f0"
-        android:padding="12dp"
+        android:background="@drawable/status_background"
+        android:padding="16dp"
         android:layout_marginTop="16dp">
 
         <TextView
@@ -138,35 +167,40 @@
             android:layout_height="wrap_content"
             android:text="@string/usage_instructions"
             android:textStyle="bold"
-            android:textSize="14sp"
-            android:layout_marginBottom="8dp" />
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="12dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/click_device_connect"
             android:textSize="12sp"
-            android:layout_marginBottom="4dp" />
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="6dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/long_press_details"
             android:textSize="12sp"
-            android:layout_marginBottom="4dp" />
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="6dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/auto_stop_scan"
             android:textSize="12sp"
-            android:layout_marginBottom="4dp" />
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="6dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/max_connections"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textColor="@android:color/black" />
 
     </LinearLayout>
 

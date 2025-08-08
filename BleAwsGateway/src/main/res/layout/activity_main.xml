@@ -4,41 +4,79 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:background="@android:color/white">
 
 <LinearLayout
     android:orientation="vertical"
-    android:padding="16dp"
+    android:padding="20dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
+
+    <!-- 标题区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"
+        android:padding="16dp"
+        android:background="@drawable/status_background">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BLE AWS Gateway"
+            android:textSize="14sp"
+            android:textColor="#666666" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/btnBleScan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/ble_device_scan" />
+        android:text="@string/ble_device_scan"
+        android:background="@drawable/button_primary"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/connected_devices"
         android:textStyle="bold"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp" />
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp" />
 
     <ListView
         android:id="@+id/listViewConnectedDevices"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:dividerHeight="1dp" />
+        android:dividerHeight="1dp"
+        android:background="@drawable/results_background"
+        android:padding="8dp" />
 
     <!-- 快速发送按钮区域 -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp">
 
         <Button
             android:id="@+id/btnSendR"
@@ -47,10 +85,10 @@
             android:layout_weight="1"
             android:text="R"
             android:textStyle="bold"
-            android:textSize="16sp"
-            android:backgroundTint="#FF5722"
-            android:textColor="#FFFFFF"
-            android:layout_marginEnd="4dp"
+            android:textSize="18sp"
+            android:background="@drawable/button_light_blue"
+            android:textColor="@android:color/black"
+            android:layout_marginEnd="8dp"
             android:enabled="false" />
 
         <Button
@@ -60,11 +98,11 @@
             android:layout_weight="1"
             android:text="Y"
             android:textStyle="bold"
-            android:textSize="16sp"
-            android:backgroundTint="#FFC107"
-            android:textColor="#000000"
-            android:layout_marginStart="2dp"
-            android:layout_marginEnd="2dp"
+            android:textSize="18sp"
+            android:background="@drawable/button_light_blue"
+            android:textColor="@android:color/black"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="4dp"
             android:enabled="false" />
 
         <Button
@@ -74,37 +112,44 @@
             android:layout_weight="1"
             android:text="B"
             android:textStyle="bold"
-            android:textSize="16sp"
-            android:backgroundTint="#2196F3"
-            android:textColor="#FFFFFF"
-            android:layout_marginStart="4dp"
+            android:textSize="18sp"
+            android:background="@drawable/button_light_blue"
+            android:textColor="@android:color/black"
+            android:layout_marginStart="8dp"
             android:enabled="false" />
     </LinearLayout>
 
     <!-- Real-time data area -->
-        <LinearLayout
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="8dp"
+        android:background="@drawable/status_background"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/tvConnectionStatus"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="8dp">
+            android:layout_weight="1"
+            android:text="@string/ble_disconnected"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/tvConnectionStatus"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/ble_disconnected"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvAwsStatus"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/aws_disconnected"
-                android:textStyle="bold"
-                android:gravity="end" />
-        </LinearLayout>
+        <TextView
+            android:id="@+id/tvAwsStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/aws_disconnected"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:gravity="end" />
+    </LinearLayout>
 
     <ToggleButton
         android:id="@+id/toggleReceive"
@@ -112,83 +157,104 @@
         android:layout_height="wrap_content"
         android:textOff="@string/start_receiving"
         android:textOn="@string/stop_receiving"
-        android:enabled="false" />
+        android:background="@drawable/button_primary"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:padding="12dp"
+        android:enabled="false"
+        android:layout_marginBottom="16dp" />
 
     <!-- BLE data testing area -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/ble_data_testing"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp" />
-
-    <!-- Send data type selection -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="8dp">
+        android:orientation="vertical"
+        android:background="@drawable/status_background"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/send_format"
-            android:layout_marginEnd="8dp"
-            android:gravity="center_vertical" />
+            android:text="@string/ble_data_testing"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp" />
 
-        <Spinner
-            android:id="@+id/spinnerSendType"
-            android:layout_width="0dp"
+        <!-- Send data type selection -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:enabled="false" />
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
 
-    <!-- Send data input -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="8dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/send_format"
+                android:textColor="@android:color/black"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical" />
 
-        <EditText
-            android:id="@+id/etSendData"
-            android:layout_width="0dp"
+            <Spinner
+                android:id="@+id/spinnerSendType"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:enabled="false" />
+        </LinearLayout>
+
+        <!-- Send data input -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/enter_data_to_send"
-            android:enabled="false" />
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
 
-        <Button
-            android:id="@+id/btnSendData"
-            android:layout_width="wrap_content"
+            <EditText
+                android:id="@+id/etSendData"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="@string/enter_data_to_send"
+                android:textColor="@android:color/black"
+                android:background="@drawable/results_background"
+                android:padding="12dp"
+                android:enabled="false" />
+
+            <Button
+                android:id="@+id/btnSendData"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/send"
+                android:background="@drawable/button_light_blue"
+                android:textColor="@android:color/black"
+                android:layout_marginStart="8dp"
+                android:enabled="false" />
+        </LinearLayout>
+
+        <!-- Receive data type selection -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/send"
-            android:layout_marginStart="8dp"
-            android:enabled="false" />
-    </LinearLayout>
+            android:orientation="horizontal">
 
-    <!-- Receive data type selection -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="8dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/receive_format"
+                android:textColor="@android:color/black"
+                android:layout_marginEnd="8dp"
+                android:gravity="center_vertical" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/receive_format"
-            android:layout_marginEnd="8dp"
-            android:gravity="center_vertical" />
-
-        <Spinner
-            android:id="@+id/spinnerReceiveType"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:enabled="false" />
+            <Spinner
+                android:id="@+id/spinnerReceiveType"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:enabled="false" />
+        </LinearLayout>
     </LinearLayout>
 
     <Button
@@ -196,22 +262,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/aws_iot_settings"
-        android:layout_marginTop="8dp"/>
+        android:background="@drawable/button_primary"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:padding="12dp"
+        android:layout_marginBottom="12dp"/>
         
     <Button
         android:id="@+id/btnPerformanceTest"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/performance_test"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="#4CAF50"
-        android:textColor="#FFFFFF"/>
+        android:background="@drawable/button_primary"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="8dp">
+        android:layout_marginBottom="16dp">
         
         <Button
             android:id="@+id/btnConnectAws"
@@ -219,7 +291,11 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/connect_aws_iot"
-            android:layout_marginEnd="4dp"/>
+            android:background="@drawable/button_light_blue"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:padding="12dp"
+            android:layout_marginEnd="8dp"/>
             
         <Button
             android:id="@+id/btnDiagnoseAws"
@@ -227,17 +303,20 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/diagnose"
-            android:layout_marginStart="4dp"/>
+            android:background="@drawable/button_light_blue"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:padding="12dp"
+            android:layout_marginStart="8dp"/>
     </LinearLayout>
     
-        <!-- Log control buttons -->
+    <!-- Log control buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp">
+        android:layout_marginBottom="16dp">
 
         <Button
             android:id="@+id/btnDetailedLog"
@@ -245,6 +324,9 @@
             android:layout_height="wrap_content"
             android:text="@string/detailed_log"
             android:textSize="12sp"
+            android:background="@drawable/button_light_blue"
+            android:textColor="@android:color/black"
+            android:padding="8dp"
             android:layout_marginEnd="8dp" />
             
         <Button
@@ -253,6 +335,9 @@
             android:layout_height="wrap_content"
             android:text="@string/copy_log"
             android:textSize="12sp"
+            android:background="@drawable/button_light_blue"
+            android:textColor="@android:color/black"
+            android:padding="8dp"
             android:layout_marginEnd="8dp" />
             
         <Button
@@ -260,7 +345,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/clear_log"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:background="@drawable/button_light_blue"
+            android:textColor="@android:color/black"
+            android:padding="8dp" />
     </LinearLayout>
 
     <!-- 日志区域，固定高度避免过度占用空间 -->
@@ -268,7 +356,7 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:orientation="vertical"
-        android:background="#f0f0f0"
+        android:background="@drawable/results_background"
         android:layout_marginBottom="16dp">
         
         <TextView
@@ -276,20 +364,23 @@
             android:layout_height="wrap_content"
             android:text="@string/data_log"
             android:textStyle="bold"
-            android:padding="8dp"
-            android:background="#e0e0e0" />
+            android:textColor="@android:color/black"
+            android:padding="12dp"
+            android:background="#E3F2FD" />
             
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:padding="8dp">
+            android:padding="12dp">
 
             <TextView
                 android:id="@+id/tvReceivedData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="" />
+                android:text=""
+                android:textColor="@android:color/black"
+                android:textSize="12sp" />
         </ScrollView>
     </LinearLayout>
 
@@ -298,7 +389,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#ffffff"
+        android:background="@drawable/status_background"
         android:elevation="2dp"
         android:padding="16dp">
         
@@ -308,6 +399,7 @@
             android:text="@string/real_time_performance_monitor"
             android:textStyle="bold"
             android:textSize="18sp"
+            android:textColor="@android:color/black"
             android:layout_marginBottom="12dp" />
             
         <!-- Tab切换器 -->
@@ -325,8 +417,8 @@
                 android:text="@string/resource"
                 android:textSize="11sp"
                 android:layout_marginEnd="4dp"
-                android:backgroundTint="#2196F3"
-                android:textColor="#FFFFFF" />
+                android:background="@drawable/button_primary"
+                android:textColor="@android:color/white" />
                 
             <Button
                 android:id="@+id/btnThroughputChart"
@@ -337,8 +429,8 @@
                 android:textSize="10sp"
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="2dp"
-                android:backgroundTint="#CCCCCC"
-                android:textColor="#666666" />
+                android:background="@drawable/button_light_blue"
+                android:textColor="@android:color/black" />
                 
             <Button
                 android:id="@+id/btnCostChart"
@@ -348,8 +440,8 @@
                 android:text="@string/cost"
                 android:textSize="11sp"
                 android:layout_marginStart="4dp"
-                android:backgroundTint="#CCCCCC"
-                android:textColor="#666666" />
+                android:background="@drawable/button_light_blue"
+                android:textColor="@android:color/black" />
         </LinearLayout>
             
         <!-- 单图表显示区域 -->
@@ -358,7 +450,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:layout_marginBottom="8dp"
-            android:background="#FAFAFA" />
+            android:background="@android:color/white" />
             
         <!-- 双图表显示区域 (吞吐量+延迟) -->
         <LinearLayout
@@ -381,14 +473,15 @@
                     android:text="@string/message_throughput"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    android:padding="4dp"
+                    android:textColor="@android:color/black"
+                    android:padding="8dp"
                     android:background="#E3F2FD" />
                     
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/lineChartThroughput"
                     android:layout_width="match_parent"
                     android:layout_height="150dp"
-                    android:background="#FAFAFA" />
+                    android:background="@android:color/white" />
             </LinearLayout>
             
             <!-- 延迟图表 -->
@@ -404,14 +497,15 @@
                     android:text="@string/message_latency"
                     android:textSize="12sp"
                     android:textStyle="bold"
-                    android:padding="4dp"
-                    android:background="#FFF3E0" />
+                    android:textColor="@android:color/black"
+                    android:padding="8dp"
+                    android:background="#E3F2FD" />
                     
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/lineChartLatency"
                     android:layout_width="match_parent"
                     android:layout_height="150dp"
-                    android:background="#FAFAFA" />
+                    android:background="@android:color/white" />
             </LinearLayout>
         </LinearLayout>
             

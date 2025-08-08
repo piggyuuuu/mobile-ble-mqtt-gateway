@@ -9,5 +9,7 @@
         <!-- 设置透明状态栏以避免遮挡问题 -->
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
+        <!-- 设置白色背景 -->
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 </resources>
