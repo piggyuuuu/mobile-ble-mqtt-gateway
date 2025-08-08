@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="BleAwsGateway">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-08-06T04:23:30.672064200Z">
+        <DropdownSelection timestamp="2025-08-08T10:37:49.434433400Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="Default" identifier="serial=emulator-5554;connection=25bc5cdd" />
+              <DeviceId pluginId="Default" identifier="serial=emulator-5554;connection=b2ab8fc8" />
             </handle>
           </Target>
         </DropdownSelection>
