@@ -16,12 +16,12 @@
         android:id="@+id/btnBleScan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="BLE设备扫描" />
+        android:text="@string/ble_device_scan" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="已连接的设备:"
+        android:text="@string/connected_devices"
         android:textStyle="bold"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="4dp" />
@@ -93,7 +93,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="BLE: Disconnected"
+                android:text="@string/ble_disconnected"
                 android:textStyle="bold" />
 
             <TextView
@@ -101,7 +101,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="AWS: Disconnected"
+                android:text="@string/aws_disconnected"
                 android:textStyle="bold"
                 android:gravity="end" />
         </LinearLayout>
@@ -110,15 +110,15 @@
         android:id="@+id/toggleReceive"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textOff="Start Receiving"
-        android:textOn="Stop Receiving"
+        android:textOff="@string/start_receiving"
+        android:textOn="@string/stop_receiving"
         android:enabled="false" />
 
     <!-- BLE data testing area -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="BLE Data Testing:"
+        android:text="@string/ble_data_testing"
         android:textStyle="bold"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp" />
@@ -133,7 +133,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Send Format:"
+            android:text="@string/send_format"
             android:layout_marginEnd="8dp"
             android:gravity="center_vertical" />
 
@@ -157,14 +157,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:hint="Enter data to send..."
+            android:hint="@string/enter_data_to_send"
             android:enabled="false" />
 
         <Button
             android:id="@+id/btnSendData"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Send"
+            android:text="@string/send"
             android:layout_marginStart="8dp"
             android:enabled="false" />
     </LinearLayout>
@@ -179,7 +179,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Receive Format:"
+            android:text="@string/receive_format"
             android:layout_marginEnd="8dp"
             android:gravity="center_vertical" />
 
@@ -195,9 +195,17 @@
         android:id="@+id/btnAwsSettings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="AWS IoT Settings"
+        android:text="@string/aws_iot_settings"
         android:layout_marginTop="8dp"/>
         
+    <Button
+        android:id="@+id/btnPerformanceTest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/performance_test"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#4CAF50"
+        android:textColor="#FFFFFF"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -210,7 +218,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Connect AWS IoT"
+            android:text="@string/connect_aws_iot"
             android:layout_marginEnd="4dp"/>
             
         <Button
@@ -218,7 +226,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Diagnose"
+            android:text="@string/diagnose"
             android:layout_marginStart="4dp"/>
     </LinearLayout>
     
@@ -235,7 +243,7 @@
             android:id="@+id/btnDetailedLog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Detailed Log"
+            android:text="@string/detailed_log"
             android:textSize="12sp"
             android:layout_marginEnd="8dp" />
             
@@ -243,7 +251,7 @@
             android:id="@+id/btnCopyLog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Copy Log"
+            android:text="@string/copy_log"
             android:textSize="12sp"
             android:layout_marginEnd="8dp" />
             
@@ -251,7 +259,7 @@
             android:id="@+id/btnClearLog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Clear Log"
+            android:text="@string/clear_log"
             android:textSize="12sp" />
     </LinearLayout>
 
@@ -266,7 +274,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Data Log:"
+            android:text="@string/data_log"
             android:textStyle="bold"
             android:padding="8dp"
             android:background="#e0e0e0" />
@@ -297,7 +305,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Real-time Performance Monitor"
+            android:text="@string/real_time_performance_monitor"
             android:textStyle="bold"
             android:textSize="18sp"
             android:layout_marginBottom="12dp" />
@@ -314,7 +322,7 @@
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:layout_weight="1"
-                android:text="Resource"
+                android:text="@string/resource"
                 android:textSize="11sp"
                 android:layout_marginEnd="4dp"
                 android:backgroundTint="#2196F3"
@@ -325,7 +333,7 @@
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:layout_weight="1"
-                android:text="Throughput+Latency"
+                android:text="@string/throughput_latency"
                 android:textSize="10sp"
                 android:layout_marginStart="2dp"
                 android:layout_marginEnd="2dp"
@@ -337,7 +345,7 @@
                 android:layout_width="0dp"
                 android:layout_height="36dp"
                 android:layout_weight="1"
-                android:text="Cost"
+                android:text="@string/cost"
                 android:textSize="11sp"
                 android:layout_marginStart="4dp"
                 android:backgroundTint="#CCCCCC"
@@ -370,7 +378,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Message Throughput (msg/s)"
+                    android:text="@string/message_throughput"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:padding="4dp"
@@ -393,7 +401,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Message Latency (ms)"
+                    android:text="@string/message_latency"
                     android:textSize="12sp"
                     android:textStyle="bold"
                     android:padding="4dp"
@@ -422,7 +430,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="CPU: 0%"
+                android:text="@string/cpu_usage"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:textColor="#FF6B35"
@@ -433,7 +441,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Memory: 0MB"
+                android:text="@string/memory_usage"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:textColor="#4CAF50"
@@ -444,7 +452,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Network: 0KB/s"
+                android:text="@string/network_usage"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:textColor="#2196F3"

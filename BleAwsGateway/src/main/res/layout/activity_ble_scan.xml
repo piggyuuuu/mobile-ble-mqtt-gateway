@@ -17,14 +17,14 @@
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="返回"
+            android:text="@string/back"
             android:layout_marginEnd="8dp" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="BLE设备扫描"
+            android:text="@string/ble_device_scan_title"
             android:textSize="18sp"
             android:textStyle="bold"
             android:gravity="center" />
@@ -43,14 +43,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="开始扫描"
+            android:text="@string/start_scan"
             android:layout_marginEnd="8dp" />
 
         <TextView
             android:id="@+id/tvScanStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="未扫描"
+            android:text="@string/not_scanning"
             android:gravity="center_vertical" />
 
     </LinearLayout>
@@ -67,7 +67,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="设备总数: 0 (已连接: 0)"
+            android:text="@string/device_count"
             android:textSize="14sp"
             android:layout_marginEnd="8dp" />
 
@@ -75,7 +75,7 @@
             android:id="@+id/tvConnectionPool"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="连接池: 0/5"
+            android:text="@string/connection_pool"
             android:textSize="14sp" />
 
     </LinearLayout>
@@ -92,7 +92,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="连接所有设备"
+            android:text="@string/connect_all_devices"
             android:layout_marginEnd="8dp" />
 
         <Button
@@ -100,7 +100,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="断开所有设备" />
+            android:text="@string/disconnect_all_devices" />
 
     </LinearLayout>
 
@@ -108,7 +108,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="发现的设备 (点击连接/断开，长按查看详情)"
+        android:text="@string/discovered_devices"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_marginBottom="8dp" />
@@ -136,7 +136,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="使用说明:"
+            android:text="@string/usage_instructions"
             android:textStyle="bold"
             android:textSize="14sp"
             android:layout_marginBottom="8dp" />
@@ -144,28 +144,28 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="• 点击设备列表项连接或断开设备"
+            android:text="@string/click_device_connect"
             android:textSize="12sp"
             android:layout_marginBottom="4dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="• 长按设备查看详细信息"
+            android:text="@string/long_press_details"
             android:textSize="12sp"
             android:layout_marginBottom="4dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="• 扫描会自动在10秒后停止"
+            android:text="@string/auto_stop_scan"
             android:textSize="12sp"
             android:layout_marginBottom="4dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="• 最多支持5个并发连接"
+            android:text="@string/max_connections"
             android:textSize="12sp" />
 
     </LinearLayout>

@@ -52,7 +52,7 @@ import com.amazonaws.mobileconnectors.iot.AWSIotMqttClientStatusCallback;
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus;
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttQos;
 
-// 性能监控相关导入
+// Performance monitoring related imports
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.Legend;
@@ -98,19 +98,19 @@ public class MainActivity extends AppCompatActivity {
     private static final long SCAN_PERIOD = 10_000;
     private static final int REQUEST_PERMISSIONS = 1001;
     
-    // BLE管理器
+    // BLE manager
     private BleManager bleManager;
 
     // ==== UI elements ====
-    private Button btnBleScan, btnAwsSettings, btnConnectAws, btnDiagnoseAws;
-    private Button btnSendR, btnSendY, btnSendB; // 快速发送按钮
+    private Button btnBleScan, btnAwsSettings, btnConnectAws, btnDiagnoseAws, btnPerformanceTest;
+    private Button btnSendR, btnSendY, btnSendB; // Quick send buttons
     private ListView listViewConnectedDevices;
     private ArrayAdapter<String> connectedDevicesAdapter;
     private List<BluetoothDevice> deviceList = new ArrayList<>();
     private TextView tvConnectionStatus, tvReceivedData;
     private ToggleButton toggleReceive;
     
-    // 当前选中的设备
+    // Currently selected device
     private String selectedDeviceAddress = null;
     
     // BLE data sending test controls
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
     private AWSIotMqttManager mqttManager;
     
-    // ==== 性能监控相关变量 ====
+    // ==== Performance monitoring related variables ====
     private PerformanceDataManager performanceManager;
     private MockDataGenerator mockDataGenerator;
     private LineChart lineChart;
@@ -145,10 +145,10 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout layoutDualCharts;
     private Button btnResourceChart, btnThroughputChart, btnCostChart;
     private TextView tvCpuUsage, tvMemUsage, tvNetworkUsage;
-    private int currentChartType = 0; // 0=资源, 1=吞吐量+延迟, 2=成本
+    private int currentChartType = 0; // 0=Resource, 1=Throughput+Latency, 2=Cost
     private float chartEntryIndex = 0;
     
-    // 图表数据存储
+    // Chart data storage
     private List<Entry> cpuEntries = new ArrayList<>();
     private List<Entry> memoryEntries = new ArrayList<>();
     private List<Entry> networkEntries = new ArrayList<>();
@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        // 设置全屏模式并适配状态栏
+        // Set full-screen mode and adapt status bar
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().getDecorView().setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
@@ -182,8 +182,9 @@ public class MainActivity extends AppCompatActivity {
         btnAwsSettings     = findViewById(R.id.btnAwsSettings);
         btnConnectAws      = findViewById(R.id.btnConnectAws);
         btnDiagnoseAws     = findViewById(R.id.btnDiagnoseAws);
+        btnPerformanceTest = findViewById(R.id.btnPerformanceTest);
         
-        // 快速发送按钮绑定
+        // Quick send buttons binding
         btnSendR           = findViewById(R.id.btnSendR);
         btnSendY           = findViewById(R.id.btnSendY);
         btnSendB           = findViewById(R.id.btnSendB);
@@ -197,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         spinnerSendType    = findViewById(R.id.spinnerSendType);
         spinnerReceiveType = findViewById(R.id.spinnerReceiveType);
         
-        // 性能监控组件绑定
+        // Performance monitoring components binding
         lineChart          = findViewById(R.id.lineChart);
         lineChartThroughput = findViewById(R.id.lineChartThroughput);
         lineChartLatency   = findViewById(R.id.lineChartLatency);
@@ -249,10 +250,16 @@ public class MainActivity extends AppCompatActivity {
         // click to diagnose connection
         btnDiagnoseAws.setOnClickListener(v -> diagnoseAwsConnection());
         
-        // 跳转到BLE扫描界面
+        // Navigate to BLE scan interface
         btnBleScan.setOnClickListener(v -> {
-            Toast.makeText(this, "正在跳转到BLE扫描界面...", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Navigating to BLE scan interface...", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(MainActivity.this, BleScanActivity.class));
+        });
+        
+        // Navigate to performance test interface
+        btnPerformanceTest.setOnClickListener(v -> {
+            Toast.makeText(this, "Navigating to performance test interface...", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(MainActivity.this, PerformanceTestActivity.class));
         });
 
         // BLE initialization
@@ -264,15 +271,15 @@ public class MainActivity extends AppCompatActivity {
         }
         bleScanner = bluetoothAdapter.getBluetoothLeScanner();
         
-        // 初始化BLE管理器
+        // Initialize BLE manager
         bleManager = new BleManager(this);
 
         // Request location & Bluetooth permissions
         checkAndRequestPermissions();
 
-        // 移除旧的扫描按钮逻辑，现在使用专门的BLE扫描界面
+        // Remove old scan button logic, now using dedicated BLE scan interface
 
-        // 移除旧的设备列表点击事件，现在使用专门的BLE扫描界面
+        // Remove old device list click event, now using dedicated BLE scan interface
 
         // receive/send switch
         toggleReceive.setOnCheckedChangeListener((btn, isChecked) -> {
@@ -304,12 +311,12 @@ public class MainActivity extends AppCompatActivity {
         // Detailed log toggle button
         btnDetailedLog.setOnClickListener(v -> toggleDetailedLogging());
         
-        // 快速发送按钮事件
+        // Quick send buttons event
         btnSendR.setOnClickListener(v -> sendQuickCommand("R"));
         btnSendY.setOnClickListener(v -> sendQuickCommand("Y"));
         btnSendB.setOnClickListener(v -> sendQuickCommand("B"));
         
-        // 已连接设备列表点击事件
+        // Connected device list click event
         listViewConnectedDevices.setOnItemClickListener((parent, view, position, id) -> {
             String[] connectedAddresses = getConnectedDeviceAddresses();
             if (position < connectedAddresses.length) {
@@ -348,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
             );
         }
         
-        // 初始化性能监控
+        // Initialize performance monitoring
         initializePerformanceMonitoring();
     }
 
@@ -357,7 +364,7 @@ public class MainActivity extends AppCompatActivity {
             BluetoothDevice device = result.getDevice();
             if (device.getName() != null && !deviceList.contains(device)) {
                 deviceList.add(device);
-                // 移除旧的UI更新逻辑，现在使用专门的BLE扫描界面
+                // Remove old UI update logic, now using dedicated BLE scan interface
             }
         }
     };
@@ -441,7 +448,7 @@ public class MainActivity extends AppCompatActivity {
             String deviceAddress = gatt.getDevice().getAddress();
             String deviceName = gatt.getDevice().getName();
             
-            // 记录BLE数据接收到性能监控器
+            // Record BLE data received by performance monitor
             if (performanceManager != null) {
                 performanceManager.recordBleMessage(deviceAddress, new String(rawData));
             }
@@ -526,7 +533,7 @@ public class MainActivity extends AppCompatActivity {
                         appendDetailedLog("Preparing to send to topic: " + topic);
                         appendDetailedLog("JSON content: " + jsonMessage);
                         
-                        // 记录MQTT发送开始时间
+                        // Record MQTT send start time
                         if (performanceManager != null) {
                             performanceManager.recordMqttSendStart();
                         }
@@ -534,7 +541,7 @@ public class MainActivity extends AppCompatActivity {
                         mqttManager.publishString(jsonMessage, topic, AWSIotMqttQos.QOS0);
                         appendLog("→ Sent to AWS IoT: " + topic);
                         
-                        // 记录MQTT发送完成
+                        // Record MQTT send completion
                         if (performanceManager != null) {
                             performanceManager.recordMqttSendComplete(true);
                         }
@@ -543,7 +550,7 @@ public class MainActivity extends AppCompatActivity {
                         appendLog("→ MQTT send failed: " + e.getClass().getSimpleName());
                         appendDetailedLog("   Error message: " + e.getMessage());
                         
-                        // 记录MQTT发送失败
+                        // Record MQTT send failure
                         if (performanceManager != null) {
                             performanceManager.recordMqttSendComplete(false);
                         }
@@ -1023,13 +1030,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     
-    // ==================== 性能监控相关方法 ====================
+    // ==================== Performance monitoring methods ====================
     
     private void initializePerformanceMonitoring() {
-        // 初始化性能数据管理器
+        // Initialize performance data manager
         performanceManager = new PerformanceDataManager(this);
         
-        // 初始化模拟数据生成器
+        // Initialize mock data generator
         mockDataGenerator = new MockDataGenerator(performanceManager);
         
         performanceManager.addListener(new PerformanceDataManager.PerformanceDataListener() {
@@ -1063,19 +1070,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         
-        // 设置图表切换按钮事件
+        // Set chart switch button event
         setupChartSwitchButtons();
         
-        // 初始化图表
+        // Initialize charts
         setupChart();
         
-        // 添加初始0值数据点确保图表从0开始显示
+        // Add initial 0 value data points to ensure charts start from 0
         initializeChartWithZeroData();
         
-        // 开始监控
+        // Start monitoring
         performanceManager.startMonitoring();
         
-        // 如果使用模拟数据，启动模拟数据生成
+        // If using mock data, start mock data generation
         if (MockDataGenerator.isUsingMockData()) {
             mockDataGenerator.startMockDataGeneration();
             appendLog("Mock data generator started - " + mockDataGenerator.getMockDataStats());
@@ -1093,36 +1100,36 @@ public class MainActivity extends AppCompatActivity {
     private void switchChart(int chartType) {
         currentChartType = chartType;
         
-        // 更新按钮样式
+        // Update button styles
         resetChartButtonStyles();
         switch (chartType) {
-            case 0: // 资源图表
+            case 0: // Resource chart
                 btnResourceChart.setBackgroundColor(Color.parseColor("#2196F3"));
                 btnResourceChart.setTextColor(Color.WHITE);
                 btnResourceChart.invalidate();
-                // 显示单图表，隐藏双图表
+                // Show single chart, hide dual charts
                 lineChart.setVisibility(View.VISIBLE);
                 layoutDualCharts.setVisibility(View.GONE);
                 setupChart();
                 updateCurrentChart();
                 Log.d("MainActivity", "Switched to Resource chart");
                 break;
-            case 1: // 吞吐量+延迟双图表
+            case 1: // Throughput+Latency dual charts
                 btnThroughputChart.setBackgroundColor(Color.parseColor("#2196F3"));
                 btnThroughputChart.setTextColor(Color.WHITE);
                 btnThroughputChart.invalidate();
-                // 隐藏单图表，显示双图表
+                // Hide single chart, show dual charts
                 lineChart.setVisibility(View.GONE);
                 layoutDualCharts.setVisibility(View.VISIBLE);
                 setupDualCharts();
                 updateDualCharts();
                 Log.d("MainActivity", "Switched to Throughput+Latency chart");
                 break;
-            case 2: // 成本图表
+            case 2: // Cost chart
                 btnCostChart.setBackgroundColor(Color.parseColor("#2196F3"));
                 btnCostChart.setTextColor(Color.WHITE);
                 btnCostChart.invalidate();
-                // 显示单图表，隐藏双图表
+                // Show single chart, hide dual charts
                 lineChart.setVisibility(View.VISIBLE);
                 layoutDualCharts.setVisibility(View.GONE);
                 setupChart();
@@ -1140,14 +1147,14 @@ public class MainActivity extends AppCompatActivity {
         btnCostChart.setBackgroundColor(Color.parseColor("#CCCCCC"));
         btnCostChart.setTextColor(Color.parseColor("#666666"));
         
-        // 强制刷新按钮显示
+        // Force button display refresh
         btnResourceChart.invalidate();
         btnThroughputChart.invalidate();
         btnCostChart.invalidate();
     }
     
     private void setupChart() {
-        // 基本配置
+        // Basic configuration
         lineChart.setTouchEnabled(true);
         lineChart.setDragEnabled(true);
         lineChart.setScaleEnabled(true);
@@ -1155,22 +1162,22 @@ public class MainActivity extends AppCompatActivity {
         lineChart.setDrawGridBackground(false);
         lineChart.setBackgroundColor(Color.WHITE);
         
-        // 隐藏描述文字
+        // Hide description text
         Description description = new Description();
         description.setEnabled(false);
         lineChart.setDescription(description);
         
-        // X轴配置
+        // X-axis configuration
         XAxis xAxis = lineChart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(true);
         xAxis.setGridColor(Color.LTGRAY);
         xAxis.setTextColor(Color.DKGRAY);
-        xAxis.setGranularity(5f); // 每5个数据点显示一个标签
+        xAxis.setGranularity(5f); // Display one label every 5 data points
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                // 计算相对于当前时间的秒数（越往左边的点，值越小，时间越早）
+                // Calculate seconds since current time (points further to the left have smaller values, earlier time)
                 int secondsAgo = Math.max(0, (int) (chartEntryIndex - value));
                 int minutes = secondsAgo / 60;
                 int seconds = secondsAgo % 60;
@@ -1178,7 +1185,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         
-        // Y轴配置
+        // Y-axis configuration
         YAxis leftAxis = lineChart.getAxisLeft();
         leftAxis.setDrawGridLines(true);
         leftAxis.setGridColor(Color.LTGRAY);
@@ -1186,9 +1193,9 @@ public class MainActivity extends AppCompatActivity {
         leftAxis.setAxisMinimum(0f);
         
         YAxis rightAxis = lineChart.getAxisRight();
-        rightAxis.setEnabled(false); // 隐藏右侧Y轴
+        rightAxis.setEnabled(false); // Hide right Y-axis
         
-        // 图例配置
+        // Legend configuration
         Legend legend = lineChart.getLegend();
         legend.setForm(Legend.LegendForm.LINE);
         legend.setTextSize(12f);
@@ -1209,22 +1216,22 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void updateResourceChart(PerformanceDataManager.ResourceData data) {
-        // 添加新的数据点
+        // Add new data points
         cpuEntries.add(new Entry(chartEntryIndex, data.cpuUsagePercent));
-        memoryEntries.add(new Entry(chartEntryIndex, (float) data.memoryUsageMB / data.totalMemoryMB * 100)); // 转换为百分比
-        networkEntries.add(new Entry(chartEntryIndex, Math.min(data.networkSpeedKBps, 100))); // 限制网络显示范围
+        memoryEntries.add(new Entry(chartEntryIndex, (float) data.memoryUsageMB / data.totalMemoryMB * 100)); // Convert to percentage
+        networkEntries.add(new Entry(chartEntryIndex, Math.min(data.networkSpeedKBps, 100))); // Limit network display range
         
-        // 限制数据点数量，保持最近60个点
+        // Limit data points, keep last 60 points
         if (cpuEntries.size() > 60) {
             cpuEntries.remove(0);
             memoryEntries.remove(0);
             networkEntries.remove(0);
         }
         
-        // 创建数据集
+        // Create data sets
         List<ILineDataSet> dataSets = new ArrayList<>();
         
-        // CPU数据集
+        // CPU data set
         LineDataSet cpuDataSet = new LineDataSet(new ArrayList<>(cpuEntries), "CPU Usage (%)");
         cpuDataSet.setColor(Color.parseColor("#FF6B35"));
         cpuDataSet.setLineWidth(2f);
@@ -1233,7 +1240,7 @@ public class MainActivity extends AppCompatActivity {
         cpuDataSet.setDrawFilled(false);
         dataSets.add(cpuDataSet);
         
-        // 内存数据集
+        // Memory data set
         LineDataSet memoryDataSet = new LineDataSet(new ArrayList<>(memoryEntries), "Memory Usage (%)");
         memoryDataSet.setColor(Color.parseColor("#4CAF50"));
         memoryDataSet.setLineWidth(2f);
@@ -1242,7 +1249,7 @@ public class MainActivity extends AppCompatActivity {
         memoryDataSet.setDrawFilled(false);
         dataSets.add(memoryDataSet);
         
-        // 网络数据集
+        // Network data set
         LineDataSet networkDataSet = new LineDataSet(new ArrayList<>(networkEntries), "Network Speed (KB/s)");
         networkDataSet.setColor(Color.parseColor("#2196F3"));
         networkDataSet.setLineWidth(2f);
@@ -1251,30 +1258,30 @@ public class MainActivity extends AppCompatActivity {
         networkDataSet.setDrawFilled(false);
         dataSets.add(networkDataSet);
         
-        // 更新图表
+        // Update chart
         LineData lineData = new LineData(dataSets);
         lineChart.setData(lineData);
         
-        // 自动滚动到最新数据
+        // Auto-scroll to latest data
         if (chartEntryIndex > 30) {
             lineChart.setVisibleXRangeMaximum(30);
             lineChart.moveViewToX(chartEntryIndex);
         }
         
         lineChart.invalidate();
-        // chartEntryIndex 现在由 incrementChartIndex() 统一管理
+        // chartEntryIndex is now managed by incrementChartIndex()
     }
     
     private void updateThroughputChart(PerformanceDataManager.ThroughputData data) {
-        // 只添加MQTT成功上传数据点
+        // Only add MQTT successful upload data points
         mqttThroughputEntries.add(new Entry(chartEntryIndex, data.mqttUploadedPerSecond));
         
-        // 限制数据点数量  
+        // Limit data points  
         if (mqttThroughputEntries.size() > 60) {
             mqttThroughputEntries.remove(0);
         }
         
-        // 如果当前显示吞吐量+延迟图表，则更新双图表
+        // If current chart is Throughput+Latency, update dual charts
         if (currentChartType == 1) {
             updateThroughputDisplayInDualChart();
         }
@@ -1283,15 +1290,15 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void updateLatencyChart(PerformanceDataManager.LatencyData data) {
-        // 添加延迟数据点
+        // Add latency data points
         latencyEntries.add(new Entry(chartEntryIndex, data.totalLatencyMs));
         
-        // 限制数据点数量
+        // Limit data points
         if (latencyEntries.size() > 60) {
             latencyEntries.remove(0);
         }
         
-        // 如果当前显示吞吐量+延迟图表，则更新双图表
+        // If current chart is Throughput+Latency, update dual charts
         if (currentChartType == 1) {
             updateLatencyDisplayInDualChart();
         }
@@ -1302,7 +1309,7 @@ public class MainActivity extends AppCompatActivity {
     
     private void incrementChartIndex() {
         chartEntryIndex++;
-        // 自动滚动逻辑
+        // Auto-scroll logic
         if (chartEntryIndex > 30) {
             if (currentChartType == 0 && lineChart != null) {
                 lineChart.setVisibleXRangeMaximum(30);
@@ -1313,15 +1320,15 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void updateCostChart(PerformanceDataManager.CostData data) {
-        // 添加成本数据点
-        costEntries.add(new Entry(chartEntryIndex, (float) data.totalCostUSD * 1000)); // 转换为毫美元显示
+        // Add cost data points
+        costEntries.add(new Entry(chartEntryIndex, (float) data.totalCostUSD * 1000)); // Convert to milli-USD for display
         
-        // 限制数据点数量
+        // Limit data points
         if (costEntries.size() > 60) {
             costEntries.remove(0);
         }
         
-        // 如果当前显示成本图表，则更新
+        // If current chart is Cost, update
         if (currentChartType == 2) {
             updateCostDisplay();
         }
@@ -1330,7 +1337,7 @@ public class MainActivity extends AppCompatActivity {
     private void updateThroughputDisplay() {
         List<ILineDataSet> dataSets = new ArrayList<>();
         
-        // BLE吞吐量数据集
+        // BLE throughput data set
         LineDataSet bleDataSet = new LineDataSet(new ArrayList<>(bleThrouputEntries), "BLE Messages/sec");
         bleDataSet.setColor(Color.parseColor("#FF6B35"));
         bleDataSet.setLineWidth(2f);
@@ -1338,7 +1345,7 @@ public class MainActivity extends AppCompatActivity {
         bleDataSet.setValueTextSize(0f);
         dataSets.add(bleDataSet);
         
-        // MQTT吞吐量数据集
+        // MQTT throughput data set
         LineDataSet mqttDataSet = new LineDataSet(new ArrayList<>(mqttThroughputEntries), "MQTT Messages/sec");
         mqttDataSet.setColor(Color.parseColor("#4CAF50"));
         mqttDataSet.setLineWidth(2f);
@@ -1379,7 +1386,7 @@ public class MainActivity extends AppCompatActivity {
         LineData lineData = new LineData(dataSets);
         lineChart.setData(lineData);
         
-        // 自动滚动到最新数据
+        // Auto-scroll to latest data
         if (chartEntryIndex > 30) {
             lineChart.setVisibleXRangeMaximum(30);
             lineChart.moveViewToX(chartEntryIndex);
@@ -1389,9 +1396,9 @@ public class MainActivity extends AppCompatActivity {
     }
     
     private void updateCurrentChart() {
-        // 根据当前图表类型更新对应的历史数据
+        // Update historical data based on current chart type
         switch (currentChartType) {
-            case 0: // 资源图表
+            case 0: // Resource chart
                 if (!cpuEntries.isEmpty()) {
                     List<ILineDataSet> dataSets = new ArrayList<>();
                     
@@ -1419,25 +1426,25 @@ public class MainActivity extends AppCompatActivity {
                     updateChartDisplay(dataSets);
                 }
                 break;
-            case 1: // 吞吐量+延迟双图表
+            case 1: // Throughput+Latency dual charts
                 updateDualCharts();
                 break;
-            case 2: // 成本图表
+            case 2: // Cost chart
                 updateCostDisplay();
                 break;
         }
     }
     
     private void setupDualCharts() {
-        // 设置吞吐量图表
+        // Set throughput chart
         setupSingleChart(lineChartThroughput, "Throughput Chart");
         
-        // 设置延迟图表
+        // Set latency chart
         setupSingleChart(lineChartLatency, "Latency Chart");
     }
     
     private void setupSingleChart(LineChart chart, String title) {
-        // 基本配置
+        // Basic configuration
         chart.setTouchEnabled(true);
         chart.setDragEnabled(true);
         chart.setScaleEnabled(true);
@@ -1445,12 +1452,12 @@ public class MainActivity extends AppCompatActivity {
         chart.setDrawGridBackground(false);
         chart.setBackgroundColor(Color.WHITE);
         
-        // 隐藏描述文字
+        // Hide description text
         Description description = new Description();
         description.setEnabled(false);
         chart.setDescription(description);
         
-        // X轴配置
+        // X-axis configuration
         XAxis xAxis = chart.getXAxis();
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
         xAxis.setDrawGridLines(true);
@@ -1467,7 +1474,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         
-        // Y轴配置
+        // Y-axis configuration
         YAxis leftAxis = chart.getAxisLeft();
         leftAxis.setDrawGridLines(true);
         leftAxis.setGridColor(Color.LTGRAY);
@@ -1477,7 +1484,7 @@ public class MainActivity extends AppCompatActivity {
         YAxis rightAxis = chart.getAxisRight();
         rightAxis.setEnabled(false);
         
-        // 图例配置
+        // Legend configuration
         Legend legend = chart.getLegend();
         legend.setForm(Legend.LegendForm.LINE);
         legend.setTextSize(10f);
@@ -1497,7 +1504,7 @@ public class MainActivity extends AppCompatActivity {
             List<ILineDataSet> dataSets = new ArrayList<>();
             
             if (!mqttThroughputEntries.isEmpty() && mqttThroughputEntries.size() > 0) {
-                // 验证数据有效性
+                // Validate data
                 List<Entry> validEntries = new ArrayList<>();
                 for (Entry entry : mqttThroughputEntries) {
                     if (entry != null && !Float.isNaN(entry.getY()) && !Float.isInfinite(entry.getY())) {
@@ -1536,7 +1543,7 @@ public class MainActivity extends AppCompatActivity {
             List<ILineDataSet> dataSets = new ArrayList<>();
             
             if (!latencyEntries.isEmpty() && latencyEntries.size() > 0) {
-                // 验证数据有效性
+                // Validate data
                 List<Entry> validEntries = new ArrayList<>();
                 for (Entry entry : latencyEntries) {
                     if (entry != null && !Float.isNaN(entry.getY()) && !Float.isInfinite(entry.getY()) && entry.getY() >= 0) {
@@ -1572,7 +1579,7 @@ public class MainActivity extends AppCompatActivity {
     
     private void initializeChartWithZeroData() {
         try {
-            // 清空现有数据
+            // Clear existing data
             cpuEntries.clear();
             memoryEntries.clear();
             networkEntries.clear();
@@ -1581,10 +1588,10 @@ public class MainActivity extends AppCompatActivity {
             latencyEntries.clear();
             costEntries.clear();
             
-            // 重置索引
+            // Reset index
             chartEntryIndex = 0;
             
-            // 添加初始的0值数据点
+            // Add initial 0 value data points
             for (int i = 0; i < 5; i++) {
                 cpuEntries.add(new Entry(chartEntryIndex, 0f));
                 memoryEntries.add(new Entry(chartEntryIndex, 0f));
@@ -1597,7 +1604,7 @@ public class MainActivity extends AppCompatActivity {
             
             Log.d("MainActivity", "Chart initialized with zero data, entries: " + mqttThroughputEntries.size());
             
-            // 显示初始资源图表
+            // Show initial resource chart
             updateCurrentChart();
         } catch (Exception e) {
             Log.e("MainActivity", "Error initializing chart data: " + e.getMessage());
@@ -1611,21 +1618,21 @@ public class MainActivity extends AppCompatActivity {
             performanceManager.startMonitoring();
         }
         
-        // 恢复模拟数据生成
+        // Resume mock data generation
         if (mockDataGenerator != null && MockDataGenerator.isUsingMockData()) {
             mockDataGenerator.startMockDataGeneration();
             appendLog("Mock data generator resumed");
         }
         
-        // 更新已连接设备列表
+        // Update connected device list
         updateConnectedDevicesList();
     }
     
     @Override
     protected void onPause() {
         super.onPause();
-        // 不在onPause时停止监控，避免切换应用时中断
-        // 改为只在onDestroy时停止
+        // Do not stop monitoring on onPause, to avoid interruption when switching apps
+        // Changed to stop only on onDestroy
     }
     
     @Override
@@ -1640,12 +1647,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 更新已连接设备列表
+     * Update connected device list
      */
     private void updateConnectedDevicesList() {
         connectedDevicesAdapter.clear();
         
-        // 获取所有已连接的设备
+        // Get all connected devices
         String[] connectedAddresses = getConnectedDeviceAddresses();
         
         for (String address : connectedAddresses) {
@@ -1654,15 +1661,15 @@ public class MainActivity extends AppCompatActivity {
             connectedDevicesAdapter.add(deviceInfo);
         }
         
-        // 更新连接状态显示
-        tvConnectionStatus.setText("BLE: " + connectedAddresses.length + " 设备已连接");
+        // Update connection status display
+        tvConnectionStatus.setText("BLE: " + connectedAddresses.length + " devices connected");
         
-        // 更新快速发送按钮状态
+        // Update quick send buttons status
         updateQuickSendButtons();
     }
 
     /**
-     * 获取已连接设备的地址列表
+     * Get list of connected device addresses
      */
     private String[] getConnectedDeviceAddresses() {
         if (bleManager != null) {
@@ -1673,7 +1680,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 根据地址获取设备名称
+     * Get device name by address
      */
     private String getDeviceNameByAddress(String address) {
         if (bleManager != null) {
@@ -1686,58 +1693,58 @@ public class MainActivity extends AppCompatActivity {
     }
     
     /**
-     * 发送快速命令到选中的设备
+     * Send quick command to selected device
      */
     private void sendQuickCommand(String command) {
         if (selectedDeviceAddress == null) {
-            Toast.makeText(this, "请先选择一个已连接的设备", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select a connected device first", Toast.LENGTH_SHORT).show();
             return;
         }
         
         if (!bleManager.isDeviceConnected(selectedDeviceAddress)) {
-            Toast.makeText(this, "设备已断开连接", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Device disconnected", Toast.LENGTH_SHORT).show();
             selectedDeviceAddress = null;
             updateQuickSendButtons();
             return;
         }
         
-        // 发送UTF-8字符串
+        // Send UTF-8 string
         boolean success = bleManager.sendCommand(selectedDeviceAddress, command);
         if (success) {
-            appendLog("发送命令 '" + command + "' 到设备: " + selectedDeviceAddress);
-            Toast.makeText(this, "命令已发送: " + command, Toast.LENGTH_SHORT).show();
+            appendLog("Sent command '" + command + "' to device: " + selectedDeviceAddress);
+            Toast.makeText(this, "Command sent: " + command, Toast.LENGTH_SHORT).show();
         } else {
-            appendLog("发送命令失败: " + command);
-            Toast.makeText(this, "发送失败", Toast.LENGTH_SHORT).show();
+            appendLog("Send command failed: " + command);
+            Toast.makeText(this, "Send failed", Toast.LENGTH_SHORT).show();
         }
     }
     
     /**
-     * 显示设备操作选项对话框
+     * Show device operation options dialog
      */
     private void showDeviceOptionsDialog(String deviceAddress) {
         String deviceName = getDeviceNameByAddress(deviceAddress);
         
-        String[] options = {"查看设备信息", "断开连接"};
+        String[] options = {"View device info", "Disconnect"};
         
         new AlertDialog.Builder(this)
-            .setTitle("设备操作: " + deviceName)
+            .setTitle("Device Options: " + deviceName)
             .setItems(options, (dialog, which) -> {
                 switch (which) {
-                    case 0: // 查看设备信息
+                    case 0: // View device info
                         showDeviceInfo(deviceAddress);
                         break;
-                    case 1: // 断开连接
+                    case 1: // Disconnect
                         disconnectDevice(deviceAddress);
                         break;
                 }
             })
-            .setNegativeButton("取消", null)
+            .setNegativeButton("Cancel", null)
             .show();
     }
     
     /**
-     * 显示设备详细信息
+     * Show device detailed info
      */
     private void showDeviceInfo(String deviceAddress) {
         if (bleManager == null) return;
@@ -1746,23 +1753,23 @@ public class MainActivity extends AppCompatActivity {
         if (info == null) return;
         
         StringBuilder infoText = new StringBuilder();
-        infoText.append("设备名称: ").append(info.deviceName).append("\n");
-        infoText.append("设备地址: ").append(info.deviceAddress).append("\n");
-        infoText.append("连接时间: ").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault())
+        infoText.append("Device Name: ").append(info.deviceName).append("\n");
+        infoText.append("Device Address: ").append(info.deviceAddress).append("\n");
+        infoText.append("Connection Time: ").append(new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault())
             .format(new java.util.Date(info.connectTime))).append("\n");
-        infoText.append("连接状态: ").append(info.state.name()).append("\n");
-        infoText.append("重连次数: ").append(info.reconnectAttempts).append("\n");
-        infoText.append("是否重连中: ").append(info.isReconnecting ? "是" : "否");
+        infoText.append("Connection State: ").append(info.state.name()).append("\n");
+        infoText.append("Reconnect Attempts: ").append(info.reconnectAttempts).append("\n");
+        infoText.append("Is Reconnecting: ").append(info.isReconnecting ? "Yes" : "No");
         
         new AlertDialog.Builder(this)
-            .setTitle("设备信息")
+            .setTitle("Device Info")
             .setMessage(infoText.toString())
-            .setPositiveButton("确定", null)
+            .setPositiveButton("OK", null)
             .show();
     }
     
     /**
-     * 断开指定设备连接
+     * Disconnect specified device
      */
     private void disconnectDevice(String deviceAddress) {
         if (bleManager == null) return;
@@ -1770,23 +1777,23 @@ public class MainActivity extends AppCompatActivity {
         String deviceName = getDeviceNameByAddress(deviceAddress);
         
         new AlertDialog.Builder(this)
-            .setTitle("断开连接")
-            .setMessage("确定要断开设备 '" + deviceName + "' 的连接吗？")
-            .setPositiveButton("确定", (dialog, which) -> {
+            .setTitle("Disconnect")
+            .setMessage("Are you sure you want to disconnect device '" + deviceName + "'?")
+            .setPositiveButton("Yes", (dialog, which) -> {
                 bleManager.disconnectDevice(deviceAddress);
                 if (selectedDeviceAddress != null && selectedDeviceAddress.equals(deviceAddress)) {
                     selectedDeviceAddress = null;
                     updateQuickSendButtons();
                 }
-                Toast.makeText(this, "已断开设备: " + deviceName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Disconnected device: " + deviceName, Toast.LENGTH_SHORT).show();
                 updateConnectedDevicesList();
             })
-            .setNegativeButton("取消", null)
+            .setNegativeButton("Cancel", null)
             .show();
     }
     
     /**
-     * 更新快速发送按钮状态
+     * Update quick send buttons status
      */
     private void updateQuickSendButtons() {
         boolean hasSelectedDevice = selectedDeviceAddress != null && 
@@ -1797,7 +1804,7 @@ public class MainActivity extends AppCompatActivity {
         btnSendY.setEnabled(hasSelectedDevice);
         btnSendB.setEnabled(hasSelectedDevice);
         
-        // 更新按钮颜色
+        // Update button colors
         if (hasSelectedDevice) {
             btnSendR.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#FF5722")));
             btnSendY.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#FFC107")));

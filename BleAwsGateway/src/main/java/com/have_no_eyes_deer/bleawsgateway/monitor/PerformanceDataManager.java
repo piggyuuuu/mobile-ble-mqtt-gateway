@@ -11,25 +11,25 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 统一的性能数据管理器 - 收集BLE、MQTT、系统资源等所有监控数据
+ * Unified Performance Data Manager - Collects all monitoring data including BLE, MQTT, system resources, etc.
  */
 public class PerformanceDataManager {
     
-    private static final int MAX_DATA_POINTS = 60; // 保留60个数据点
-    private static final double AWS_IOT_MESSAGE_COST = 0.000001; // AWS IoT消息单价(美元)
+    private static final int MAX_DATA_POINTS = 60; // Keep 60 data points
+    private static final double AWS_IOT_MESSAGE_COST = 0.000001; // AWS IoT message unit price (USD)
     
     private Context context;
     private Handler handler;
     private ResourceMonitor resourceMonitor;
     private List<PerformanceDataListener> listeners = new ArrayList<>();
     
-    // 数据存储
+    // Data storage
     private List<ResourceData> resourceHistory = new CopyOnWriteArrayList<>();
     private List<ThroughputData> throughputHistory = new CopyOnWriteArrayList<>();
     private List<LatencyData> latencyHistory = new CopyOnWriteArrayList<>();
     private List<CostData> costHistory = new CopyOnWriteArrayList<>();
     
-    // 统计计数器
+    // Statistics counters
     private long totalBleMessages = 0;
     private long totalMqttMessages = 0;
     private long totalMqttMessagesSent = 0;
@@ -44,7 +44,7 @@ public class PerformanceDataManager {
         void onError(String error);
     }
     
-    // 数据模型类
+    // Data model classes
     public static class ResourceData {
         public long timestamp;
         public float cpuUsagePercent;
@@ -64,7 +64,7 @@ public class PerformanceDataManager {
     
     public static class ThroughputData {
         public long timestamp;
-        public int mqttUploadedPerSecond;  // 每秒成功上传到AWS的MQTT消息数
+        public int mqttUploadedPerSecond;  // Number of MQTT messages successfully uploaded to AWS per second
         
         public ThroughputData(long timestamp, int mqttUploaded) {
             this.timestamp = timestamp;
@@ -74,9 +74,9 @@ public class PerformanceDataManager {
     
     public static class LatencyData {
         public long timestamp;
-        public long bleReceiveTime;    // BLE消息接收时间戳
-        public long awsCompleteTime;   // AWS上传完成时间戳
-        public long totalLatencyMs;    // BLE→AWS总延迟(ms)
+        public long bleReceiveTime;    // BLE message receive timestamp
+        public long awsCompleteTime;   // AWS upload completion timestamp
+        public long totalLatencyMs;    // BLE→AWS total latency (ms)
         
         public LatencyData(long timestamp, long bleTime, long awsTime) {
             this.timestamp = timestamp;
@@ -98,8 +98,8 @@ public class PerformanceDataManager {
             this.messagesInLastPeriod = messages;
             this.costInLastPeriodUSD = periodCost;
             this.totalCostUSD = totalCost;
-            // 基于当前速率计算每日预估成本
-            this.dailyProjectedCostUSD = periodCost * 86400; // 24小时 * 3600秒
+            // Calculate daily projected cost based on current rate
+            this.dailyProjectedCostUSD = periodCost * 86400; // 24 hours * 3600 seconds
         }
     }
     
@@ -125,7 +125,7 @@ public class PerformanceDataManager {
             
             @Override
             public void onError(String error) {
-                notifyErrorListeners("资源监控错误: " + error);
+                notifyErrorListeners("Resource monitoring error: " + error);
             }
         });
     }
@@ -153,37 +153,37 @@ public class PerformanceDataManager {
     }
     
     private void startPeriodicDataCollection() {
-        handler.postDelayed(this::collectPeriodicData, 1000); // 保持1秒间隔收集数据
+        handler.postDelayed(this::collectPeriodicData, 1000); // Keep 1 second interval for data collection
     }
     
     private void collectPeriodicData() {
         collectThroughputData();
         collectCostData();
         
-        // 调度下次收集
-        handler.postDelayed(this::collectPeriodicData, 1000); // 保持1秒间隔收集数据
+        // Schedule next collection
+        handler.postDelayed(this::collectPeriodicData, 1000); // Keep 1 second interval for data collection
     }
     
-    // ==================== BLE数据接口 ====================
+    // ==================== BLE data interface ====================
     
     private long lastBleMessageTime = 0;
-    private Map<String, Long> bleMessageTimestamps = new ConcurrentHashMap<>(); // 存储每条BLE消息的时间戳
+    private Map<String, Long> bleMessageTimestamps = new ConcurrentHashMap<>(); // Store timestamp for each BLE message
     
     public void recordBleMessage(String deviceAddress, String data) {
         long currentTime = System.currentTimeMillis();
         totalBleMessages++;
         lastBleMessageTime = currentTime;
         
-        // 为每条BLE消息生成唯一ID并记录时间戳
+        // Generate a unique ID for each BLE message and record its timestamp
         String messageId = deviceAddress + "_" + currentTime + "_" + totalBleMessages;
         bleMessageTimestamps.put(messageId, currentTime);
         
-        // 清理过期的时间戳记录(超过30秒)
+        // Clean up expired timestamp records (older than 30 seconds)
         bleMessageTimestamps.entrySet().removeIf(entry -> 
             currentTime - entry.getValue() > 30000);
     }
     
-    // ==================== MQTT数据接口 ====================
+    // ==================== MQTT data interface ====================
     
     private int mqttSuccessInLastSecond = 0;
     private long mqttSuccessCountForSecond = 0;
@@ -203,7 +203,7 @@ public class PerformanceDataManager {
             totalMqttMessages++;
             totalMqttMessagesSent++;
             
-            // 计算每秒成功上传的MQTT消息数
+            // Calculate the number of MQTT messages successfully uploaded per second
             if (currentTime - lastMqttCountReset >= 1000) {
                 mqttSuccessInLastSecond = (int) mqttSuccessCountForSecond;
                 mqttSuccessCountForSecond = 0;
@@ -211,7 +211,7 @@ public class PerformanceDataManager {
             }
             mqttSuccessCountForSecond++;
             
-            // 计算BLE→AWS总延迟
+            // Calculate BLE→AWS total latency
             Long bleStartTime = findMatchingBleTimestamp();
             if (bleStartTime != null) {
                 LatencyData latencyData = new LatencyData(currentTime, bleStartTime, currentTime);
@@ -223,22 +223,22 @@ public class PerformanceDataManager {
             totalMqttMessagesFailed++;
         }
         
-        // 清理过期的MQTT发送记录
+        // Clean up expired MQTT send records
         mqttSendStartTimes.entrySet().removeIf(entry -> 
             currentTime - entry.getValue() > 30000);
     }
     
-    // 匹配最近的BLE消息时间戳
+    // Match the nearest BLE message timestamp
     private Long findMatchingBleTimestamp() {
         if (bleMessageTimestamps.isEmpty()) return null;
         
-        // 返回最近的BLE消息时间戳
+        // Return the nearest BLE message timestamp
         return bleMessageTimestamps.values().stream()
             .max(Long::compareTo)
             .orElse(null);
     }
     
-    // ==================== 数据收集方法 ====================
+    // ==================== Data collection methods ====================
     
     private void collectThroughputData() {
         long timestamp = System.currentTimeMillis();
@@ -259,7 +259,7 @@ public class PerformanceDataManager {
         notifyCostListeners(data);
     }
     
-    // ==================== 数据存储方法 ====================
+    // ==================== Data storage methods ====================
     
     private void addResourceData(ResourceData data) {
         resourceHistory.add(data);
@@ -289,7 +289,7 @@ public class PerformanceDataManager {
         }
     }
     
-    // ==================== 通知监听器方法 ====================
+    // ==================== Notify listeners methods ====================
     
     private void notifyResourceListeners(ResourceData data) {
         for (PerformanceDataListener listener : listeners) {
@@ -321,7 +321,7 @@ public class PerformanceDataManager {
         }
     }
     
-    // ==================== 数据获取方法 ====================
+    // ==================== Data retrieval methods ====================
     
     public List<ResourceData> getResourceHistory() {
         return new ArrayList<>(resourceHistory);

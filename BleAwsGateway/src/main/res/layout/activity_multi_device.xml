@@ -17,14 +17,14 @@
             android:id="@+id/btnBack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="返回"
+            android:text="@string/back"
             android:layout_marginEnd="8dp" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="多设备连接管理"
+            android:text="@string/multi_device_management"
             android:textSize="18sp"
             android:textStyle="bold"
             android:gravity="center" />
@@ -43,14 +43,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="开始扫描"
+            android:text="@string/start_scan"
             android:layout_marginEnd="8dp" />
 
         <TextView
             android:id="@+id/tvScanStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="未扫描"
+            android:text="@string/not_scanning"
             android:gravity="center_vertical" />
 
     </LinearLayout>
@@ -60,7 +60,7 @@
         android:id="@+id/tvConnectionPool"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="连接池: 0/5"
+        android:text="@string/connection_pool"
         android:textSize="14sp"
         android:layout_marginBottom="8dp" />
 
@@ -76,7 +76,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="连接所有设备"
+            android:text="@string/connect_all"
             android:layout_marginEnd="8dp" />
 
         <Button
@@ -84,7 +84,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="断开所有设备" />
+            android:text="@string/disconnect_all" />
 
     </LinearLayout>
 
@@ -106,7 +106,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="发现的设备"
+                android:text="@string/discovered_devices_title"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
@@ -133,7 +133,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="已连接的设备"
+                android:text="@string/connected_devices_title"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="8dp" />
@@ -162,14 +162,14 @@
             android:id="@+id/tvConnectionStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="已连接设备: 0"
+            android:text="@string/connected_device_count"
             android:textSize="14sp"
             android:layout_marginBottom="8dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="接收到的数据:"
+            android:text="@string/received_data"
             android:textSize="14sp"
             android:textStyle="bold"
             android:layout_marginBottom="4dp" />
@@ -186,7 +186,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="12sp"
                 android:fontFamily="monospace"
-                android:text="等待数据..." />
+                android:text="@string/waiting_for_data" />
 
         </ScrollView>
 

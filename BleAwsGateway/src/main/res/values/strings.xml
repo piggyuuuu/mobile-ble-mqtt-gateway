@@ -7,6 +7,86 @@
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
+    <!-- Main Activity -->
+    <string name="ble_device_scan">BLE Device Scan</string>
+    <string name="connected_devices">Connected Devices:</string>
+    <string name="ble_disconnected">BLE: Disconnected</string>
+    <string name="aws_disconnected">AWS: Disconnected</string>
+    <string name="start_receiving">Start Receiving</string>
+    <string name="stop_receiving">Stop Receiving</string>
+    <string name="ble_data_testing">BLE Data Testing:</string>
+    <string name="send_format">Send Format:</string>
+    <string name="enter_data_to_send">Enter data to send...</string>
+    <string name="send">Send</string>
+    <string name="receive_format">Receive Format:</string>
+    <string name="aws_iot_settings">AWS IoT Settings</string>
+    <string name="performance_test">Performance Test</string>
+    <string name="connect_aws_iot">Connect AWS IoT</string>
+    <string name="diagnose">Diagnose</string>
+    <string name="detailed_log">Detailed Log</string>
+    <string name="copy_log">Copy Log</string>
+    <string name="clear_log">Clear Log</string>
+    <string name="data_log">Data Log:</string>
+    <string name="real_time_performance_monitor">Real-time Performance Monitor</string>
+    <string name="resource">Resource</string>
+    <string name="throughput_latency">Throughput+Latency</string>
+    <string name="cost">Cost</string>
+    <string name="message_throughput">Message Throughput (msg/s)</string>
+    <string name="message_latency">Message Latency (ms)</string>
+    <string name="cpu_usage">CPU: %1$d%%</string>
+    <string name="memory_usage">Memory: %1$dMB</string>
+    <string name="network_usage">Network: %1$dKB/s</string>
+
+    <!-- BLE Scan Activity -->
+    <string name="back">Back</string>
+    <string name="ble_device_scan_title">BLE Device Scan</string>
+    <string name="start_scan">Start Scan</string>
+    <string name="stop_scan">Stop Scan</string>
+    <string name="not_scanning">Not Scanning</string>
+    <string name="scanning">Scanning...</string>
+    <string name="scan_stopped">Scan Stopped</string>
+    <string name="device_count">Total Devices: %1$d (Connected: %2$d)</string>
+    <string name="connection_pool">Connection Pool: %1$d/%2$d</string>
+    <string name="connect_all_devices">Connect All Devices</string>
+    <string name="disconnect_all_devices">Disconnect All Devices</string>
+    <string name="discovered_devices">Discovered Devices (Click to connect/disconnect, long press for details)</string>
+    <string name="usage_instructions">Usage Instructions:</string>
+    <string name="click_device_connect">• Click device list item to connect or disconnect device</string>
+    <string name="long_press_details">• Long press device to view details</string>
+    <string name="auto_stop_scan">• Scan will automatically stop after 10 seconds</string>
+    <string name="max_connections">• Maximum 5 concurrent connections supported</string>
+
+    <!-- Performance Test Activity -->
+    <string name="performance_test_title">Performance Test</string>
+    <string name="start_test">Start Test</string>
+    <string name="stop_test">Stop Test</string>
+    <string name="export_data">Export Data</string>
+    <string name="test_progress">Test Progress</string>
+    <string name="current_status">Current Status</string>
+    <string name="ready">Ready</string>
+    <string name="ready_click_start">Ready, click start test</string>
+    <string name="test_results">Test Results</string>
+    <string name="waiting_for_test">Waiting for test to start...</string>
+    <string name="test_started">Test started: %1$s</string>
+    <string name="test_completed">Test completed: %1$s</string>
+    <string name="test_error">Test error: %1$s</string>
+    <string name="test_already_running">Test is already running</string>
+
+    <!-- Multi Device Activity -->
+    <string name="multi_device_management">Multi-Device Connection Management</string>
+    <string name="connect_all">Connect All</string>
+    <string name="disconnect_all">Disconnect All</string>
+    <string name="discovered_devices_title">Discovered Devices</string>
+    <string name="connected_devices_title">Connected Devices</string>
+    <string name="connected_device_count">Connected Devices: %1$d</string>
+    <string name="received_data">Received Data:</string>
+    <string name="waiting_for_data">Waiting for data...</string>
+    <string name="connecting_device">Connecting device: %1$s</string>
+    <string name="connection_failed">Connection failed</string>
+    <string name="trying_connect_devices">Trying to connect %1$d devices</string>
+    <string name="disconnecting_devices">Disconnecting devices</string>
+    <string name="disconnect_all_devices">Disconnect all devices</string>
+
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus

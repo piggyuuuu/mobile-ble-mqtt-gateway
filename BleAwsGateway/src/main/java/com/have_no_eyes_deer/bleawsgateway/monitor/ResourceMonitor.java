@@ -15,28 +15,28 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * 系统资源监控器 - 收集CPU、内存、网络使用情况
+ * System Resource Monitor - Collects CPU, memory, and network usage information
  */
 public class ResourceMonitor {
     
-    private static final int DEFAULT_UPDATE_INTERVAL = 1000; // 1秒更新一次
-    private static final int MAX_DATA_POINTS = 60; // 保留60个数据点（1分钟历史）
+    private static final int DEFAULT_UPDATE_INTERVAL = 1000; // Update every 1 second
+    private static final int MAX_DATA_POINTS = 60; // Keep 60 data points (1 minute history)
     
     private Context context;
     private Handler handler;
     private boolean isMonitoring = false;
     private int updateInterval = DEFAULT_UPDATE_INTERVAL;
     
-    // 数据存储
+    // Data storage
     private List<ResourceData> resourceDataHistory = new CopyOnWriteArrayList<>();
     private List<ResourceMonitorListener> listeners = new ArrayList<>();
     
-    // 网络流量计算
+    // Network traffic calculation
     private long lastTxBytes = 0;
     private long lastRxBytes = 0;
     private long lastTimestamp = 0;
     
-    // CPU计算相关
+    // CPU calculation related
     private long lastCpuTotal = 0;
     private long lastCpuIdle = 0;
     
@@ -132,22 +132,22 @@ public class ResourceMonitor {
             
             ResourceData data = new ResourceData(timestamp, cpuUsage, memoryUsage, networkSpeed, totalMemory);
             
-            // 添加到历史数据
+            // Add to history data
             resourceDataHistory.add(data);
             
-            // 限制历史数据数量
+            // Limit history data size
             if (resourceDataHistory.size() > MAX_DATA_POINTS) {
                 resourceDataHistory.remove(0);
             }
             
-            // 通知监听器
+            // Notify listeners
             for (ResourceMonitorListener listener : listeners) {
                 listener.onResourceDataUpdate(data);
             }
             
         } catch (Exception e) {
             for (ResourceMonitorListener listener : listeners) {
-                listener.onError("资源监控错误: " + e.getMessage());
+                listener.onError("Resource monitoring error: " + e.getMessage());
             }
         }
         
@@ -188,7 +188,7 @@ public class ResourceMonitor {
                 }
             }
         } catch (IOException e) {
-            // 如果无法读取/proc/stat，使用简化方法
+            // If /proc/stat cannot be read, use a simplified method
             return getSimplifiedCpuUsage();
         }
         
@@ -196,16 +196,16 @@ public class ResourceMonitor {
     }
     
     private float getSimplifiedCpuUsage() {
-        // 使用Debug API获取粗略的CPU使用率
+        // Use Debug API to get a rough CPU usage rate
         Debug.MemoryInfo memInfo = new Debug.MemoryInfo();
         Debug.getMemoryInfo(memInfo);
         
-        // 这是一个简化的估算，实际CPU使用率需要更复杂的计算
+        // This is a simplified estimate, actual CPU usage rate requires more complex calculation
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningAppProcessInfo> processes = am.getRunningAppProcesses();
         
         if (processes != null && !processes.isEmpty()) {
-            // 基于运行进程数量的简单估算
+            // Simple estimate based on number of running processes
             return Math.min(processes.size() * 2.0f, 30.0f);
         }
         
@@ -216,7 +216,7 @@ public class ResourceMonitor {
         Debug.MemoryInfo memInfo = new Debug.MemoryInfo();
         Debug.getMemoryInfo(memInfo);
         
-        // 返回当前应用的内存使用量（MB）
+        // Return current application memory usage (MB)
         return memInfo.getTotalPss() / 1024; // PSS in KB -> MB
     }
     
@@ -234,7 +234,7 @@ public class ResourceMonitor {
         long currentTimestamp = System.currentTimeMillis();
         
         if (lastTxBytes == -1 || lastRxBytes == -1) {
-            // 网络统计不可用
+            // Network statistics unavailable
             initializeNetworkBaseline();
             return 0.0f;
         }
@@ -248,11 +248,11 @@ public class ResourceMonitor {
         long rxDiff = currentRxBytes - lastRxBytes;
         long totalBytesDiff = txDiff + rxDiff;
         
-        // 计算每秒字节数，然后转换为KB/s
+        // Calculate bytes per second, then convert to KB/s
         float speedBytesPerSec = (float) totalBytesDiff * 1000 / timeDiff;
         float speedKBps = speedBytesPerSec / 1024;
         
-        // 更新基线值
+        // Update baseline values
         lastTxBytes = currentTxBytes;
         lastRxBytes = currentRxBytes;
         lastTimestamp = currentTimestamp;

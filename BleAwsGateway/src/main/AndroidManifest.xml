@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <!-- AWS IoT 连接需要的网络权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -44,5 +45,21 @@
         <activity
             android:name=".BleScanActivity"
             android:label="BLE设备扫描"/>
+            
+        <!-- 性能测试界面 -->
+        <activity
+            android:name=".PerformanceTestActivity"
+            android:label="性能测试"/>
+            
+        <!-- 文件提供者配置 -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 </manifest>
