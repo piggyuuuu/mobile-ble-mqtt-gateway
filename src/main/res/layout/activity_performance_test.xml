@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@android:color/white"
+    tools:context=".PerformanceTestActivity">
+
+    <!-- 标题区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginBottom="24dp"
+        android:padding="16dp"
+        android:background="@drawable/status_background">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/performance_test_title"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Performance Testing &amp; Monitoring"
+            android:textSize="14sp"
+            android:textColor="#666666" />
+    </LinearLayout>
+
+    <!-- 控制按钮区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp">
+
+        <Button
+            android:id="@+id/btn_start_test"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/start_test"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/button_primary"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:padding="16dp" />
+
+        <Button
+            android:id="@+id/btn_stop_test"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/stop_test"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/button_secondary"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:padding="16dp" />
+
+    </LinearLayout>
+
+    <!-- 保存数据按钮 -->
+    <Button
+        android:id="@+id/btn_save_results"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/export_data"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/button_light_blue"
+        android:textColor="@android:color/black"
+        android:textSize="16sp"
+        android:padding="12dp"
+        android:enabled="false" />
+
+    <!-- 进度条区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/status_background"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/test_progress"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="100"
+            android:progress="0" />
+
+    </LinearLayout>
+
+    <!-- 状态显示 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/status_background"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/current_status"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ready"
+            android:textSize="14sp"
+            android:textColor="@android:color/black" />
+
+    </LinearLayout>
+
+    <!-- 测试结果区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:background="@drawable/results_background"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/test_results"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="12dp" />
+
+        <ScrollView
+            android:id="@+id/scroll_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/tv_results"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/waiting_for_test"
+                android:textSize="12sp"
+                android:fontFamily="monospace"
+                android:textColor="@android:color/black"
+                android:textIsSelectable="true" />
+
+        </ScrollView>
+
+    </LinearLayout>
+
+</LinearLayout> 

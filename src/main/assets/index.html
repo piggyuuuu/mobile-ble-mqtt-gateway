@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>BLE Connection Demo</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; }
+button { padding: 10px; margin: 5px; }
+</style>
+</head>
+<body>
+<h1>BLE Device Scanning</h1>
+<button onclick="startScan()">Start Scan</button>
+<button onclick="stopScan()">Stop Scan</button>
+<div id="status">Ready</div>
+<div id="deviceList"></div>
+<script>
+function startScan() {
+    // Call Android Java method
+    Android.startBleScan();
+    document.getElementById('status').innerText = 'Scanning...';
+}
+function stopScan() {
+    Android.stopBleScan();
+    document.getElementById('status').innerText = 'Scan stopped';
+}
+function addDevice(name, addr) {
+    var list = document.getElementById('deviceList');
+    list.innerHTML += '<div onclick="connectDevice(\'' + addr + '\')">' + name + ' (' + addr + ')</div>';
+}
+function connectDevice(addr) {
+    Android.connectToDevice(addr);
+    document.getElementById('status').innerText = 'Connecting: ' + addr;
+}
+function updateConnectionStatus(addr, state) {
+    document.getElementById('status').innerText = addr + ' is ' + state;
+}
+</script>
+</body>
+</html>

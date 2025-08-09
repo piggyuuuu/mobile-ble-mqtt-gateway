@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@android:color/white">
+
+    <!-- 标题栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/status_background"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/back"
+            android:background="@drawable/button_light_blue"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:padding="8dp"
+            android:layout_marginEnd="12dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/ble_device_scan_title"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <!-- 扫描控制区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/status_background"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/btnScan"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/start_scan"
+            android:background="@drawable/button_primary"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:padding="12dp"
+            android:layout_marginEnd="12dp" />
+
+        <TextView
+            android:id="@+id/tvScanStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/not_scanning"
+            android:textColor="@android:color/black"
+            android:textSize="14sp"
+            android:gravity="center_vertical" />
+
+    </LinearLayout>
+
+    <!-- 状态信息区域 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/status_background"
+        android:padding="12dp">
+
+        <TextView
+            android:id="@+id/tvDeviceCount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/device_count"
+            android:textSize="14sp"
+            android:textColor="@android:color/black"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/tvConnectionPool"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/connection_pool"
+            android:textSize="14sp"
+            android:textColor="@android:color/black" />
+
+    </LinearLayout>
+
+    <!-- 批量操作按钮 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp">
+
+        <Button
+            android:id="@+id/btnConnectSelected"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/connect_all_devices"
+            android:background="@drawable/button_primary"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:padding="12dp"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/btnDisconnectSelected"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/disconnect_all_devices"
+            android:background="@drawable/button_secondary"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+    <!-- 设备列表标题 -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/discovered_devices"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="12dp" />
+
+    <!-- 设备列表 -->
+    <ListView
+        android:id="@+id/listViewDevices"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/results_background"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
+        android:padding="8dp"
+        android:textColor="@android:color/black" />
+
+    <!-- 使用说明 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/status_background"
+        android:padding="16dp"
+        android:layout_marginTop="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/usage_instructions"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/click_device_connect"
+            android:textSize="12sp"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="6dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/long_press_details"
+            android:textSize="12sp"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="6dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/auto_stop_scan"
+            android:textSize="12sp"
+            android:textColor="@android:color/black"
+            android:layout_marginBottom="6dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/max_connections"
+            android:textSize="12sp"
+            android:textColor="@android:color/black" />
+
+    </LinearLayout>
+
+</LinearLayout> 
