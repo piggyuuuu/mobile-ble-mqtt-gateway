@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -5,9 +6,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <!-- AWS IoT 连接需要的网络权限 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- AWS IoT 连接需要的网络权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -20,29 +19,29 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication"
         android:usesCleartextTraffic="false">
-
+        <activity
+            android:name=".LightSwitch"
+            android:exported="false"
+            android:label="单独控制设备" /> />
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- 新增 AWS 设置界面 -->
+        </activity> <!-- 新增 AWS 设置界面 -->
         <activity
             android:name=".AWSSettingsActivity"
-            android:label="AWS IoT 设置"/>
-            
-        <!-- 多设备连接管理界面 -->
+            android:label="AWS IoT 设置" /> <!-- 多设备连接管理界面 -->
         <activity
             android:name=".MultiDeviceActivity"
-            android:label="多设备连接管理"/>
-            
-        <!-- BLE扫描界面 -->
+            android:label="多设备连接管理" /> <!-- BLE扫描界面 -->
         <activity
             android:name=".BleScanActivity"
-            android:label="BLE设备扫描"/>
+            android:label="BLE设备扫描" />
+
     </application>
+
 </manifest>

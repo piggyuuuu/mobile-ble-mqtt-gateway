@@ -50,6 +50,7 @@ import com.amazonaws.mobileconnectors.iot.AWSIotKeystoreHelper;
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttManager;
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttClientStatusCallback;
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus;
+import com.amazonaws.mobileconnectors.iot.AWSIotMqttNewMessageCallback;
 import com.amazonaws.mobileconnectors.iot.AWSIotMqttQos;
 
 // 性能监控相关导入
@@ -80,6 +81,8 @@ import java.util.concurrent.Executors;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.TimeZone;
+import org.json.JSONObject;
+import java.util.Arrays;
 
 import com.have_no_eyes_deer.bleawsgateway.ble.BleManager;
 import com.have_no_eyes_deer.bleawsgateway.ble.DeviceConnectionManager;
@@ -700,10 +703,74 @@ public class MainActivity extends AppCompatActivity {
                                     } catch (Exception e) {
                                         appendLog("Test message failed: " + e.getMessage());
                                     }
+
+                                    try {
+                                        String topic = "devices/#";  // Topic
+                                        mqttManager.subscribeToTopic(topic, AWSIotMqttQos.QOS0,
+                                                new AWSIotMqttNewMessageCallback() {
+                                                    @Override
+                                                    public void onMessageArrived(String topic, byte[] data) {
+                                                        String message = new String(data, StandardCharsets.UTF_8);
+                                                        appendLog("receive AWS message: " + message);
+                                                        //runOnUiThread(() -> Toast.makeText(MainActivity.this, "收到消息: " + message, Toast.LENGTH_SHORT).show());
+                                                        try {
+                                                            // 1) 从 topic 提取设备ID（devices/<deviceId>/...），否则从JSON中取
+                                                            String deviceIdFromTopic = null;
+                                                            String[] parts = topic.split("/");
+                                                            if (parts.length >= 2 && "devices".equals(parts[0])) {
+                                                                deviceIdFromTopic = parts[1];
+                                                            }
+
+                                                            // 解析 JSON
+                                                            JSONObject json = new JSONObject(message);
+
+                                                            // 读取字段
+                                                            String deviceId = json.optString("device", deviceIdFromTopic); // 优先 JSON，缺失就用 topic
+                                                            String type = json.optString("type", "text");
+                                                            String payload = json.optString("payload", null);
+
+                                                            // 检查是否有 deviceId
+                                                            if (deviceId.isEmpty()) {
+                                                                appendLog("not find deviceId");
+                                                                return;
+                                                            }
+
+                                                            List<String> connectedAddresses = Arrays.asList(getConnectedDeviceAddresses());
+                                                            if (!connectedAddresses.contains(deviceId)) {
+                                                                appendLog("device not connected：" + deviceId);
+                                                                return;
+                                                            }
+
+                                                            boolean success = bleManager.sendCommand(deviceId, payload);
+                                                            if (success) {
+                                                                appendLog("Send command- '" + payload + "' to: " + deviceId);
+                                                                //Toast.makeText(this, "Command has been sent: " + payload,Toast.LENGTH_SHORT).show();
+                                                            } else {
+                                                                appendLog("Command send failed: " + payload);
+                                                                //Toast.makeText(this, "fail to send", Toast.LENGTH_SHORT).show();
+                                                            }
+
+
+                                                        }catch (Exception e) {
+                                                            appendLog(": Failed to parse the message." + e.getMessage());
+                                                            e.printStackTrace();
+                                                        }
+                                                    }
+                                                });
+                                        appendLog("subscribe Topic: " + topic);
+                                    } catch (Exception e) {
+                                        appendLog("subscribe failed: " + e.getMessage());
+                                    }
+
                                     break;
                                     
                                 case Reconnecting:
                                     appendLog("Connection lost, reconnecting...");
+                                    if (throwable != null) {
+                                        appendLog("Reason: " + throwable.getMessage());
+                                        appendLog("Reason: " + throwable.getCause());
+                                        throwable.printStackTrace();
+                                    }
                                     break;
                                     
                                 case ConnectionLost:
