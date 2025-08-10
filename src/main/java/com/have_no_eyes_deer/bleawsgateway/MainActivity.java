@@ -2139,7 +2139,7 @@ public class MainActivity extends AppCompatActivity {
         // Update button colors
         if (hasSelectedDevices) {
             btnSendR.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#FF5722")));
-            btnSendY.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#FFC107")));
+            btnSendY.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#4CAF50")));
             btnSendB.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor("#2196F3")));
         } else {
             btnSendR.setBackgroundTintList(android.content.res.ColorStateList.valueOf(android.graphics.Color.GRAY));
@@ -2234,7 +2234,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 快速发送按钮事件（群发到多选设备）
         btnSendR.setOnClickListener(v -> sendQuickCommandToSelected("R"));
-        btnSendY.setOnClickListener(v -> sendQuickCommandToSelected("Y"));
+        btnSendY.setOnClickListener(v -> sendQuickCommandToSelected("G"));
         btnSendB.setOnClickListener(v -> sendQuickCommandToSelected("B"));
 
         // 数据发送测试按钮事件
